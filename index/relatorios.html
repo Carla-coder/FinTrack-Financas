@@ -1,0 +1,563 @@
+<!-- <script>
+      // Gráfico de Receitas vs Despesas
+      const incomeExpenseCtx = document
+        .getElementById("incomeExpenseChart")
+        .getContext("2d");
+      const incomeExpenseChart = new Chart(incomeExpenseCtx, {
+        type: "bar",
+        data: {
+          labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
+          datasets: [
+            {
+              label: "Receitas",
+              data: [12000, 13000, 14000, 15000, 15000, 15000],
+              backgroundColor: "rgba(40, 167, 69, 0.8)",
+            },
+            {
+              label: "Despesas",
+              data: [10000, 11000, 12000, 12500, 13000, 12500],
+              backgroundColor: "rgba(220, 53, 69, 0.8)",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    
+      // Gráfico de Detalhamento por Categoria
+      const categoryBreakdownCtx = document
+        .getElementById("categoryBreakdownChart")
+        .getContext("2d");
+      const categoryBreakdownChart = new Chart(categoryBreakdownCtx, {
+        type: "pie",
+        data: {
+          labels: [
+            "Alimentação",
+            "Transporte",
+            "Moradia",
+            "Entretenimento",
+            "Saúde",
+          ],
+          datasets: [
+            {
+              data: [3500, 1500, 4000, 2000, 1500],
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.8)",
+                "rgba(54, 162, 235, 0.8)",
+                "rgba(255, 206, 86, 0.8)",
+                "rgba(75, 192, 192, 0.8)",
+                "rgba(153, 102, 255, 0.8)",
+              ],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      });
+    
+      // Gráfico de Desempenho do Orçamento
+      const budgetPerformanceCtx = document
+        .getElementById("budgetPerformanceChart")
+        .getContext("2d");
+      const budgetPerformanceChart = new Chart(budgetPerformanceCtx, {
+        type: "bar",
+        data: {
+          labels: [
+            "Alimentação",
+            "Transporte",
+            "Moradia",
+            "Entretenimento",
+            "Saúde",
+          ],
+          datasets: [
+            {
+              label: "Orçado",
+              data: [3000, 2000, 4000, 1500, 2000],
+              backgroundColor: "rgba(54, 162, 235, 0.8)",
+            },
+            {
+              label: "Real",
+              data: [3500, 1500, 4000, 2000, 1500],
+              backgroundColor: "rgba(255, 99, 132, 0.8)",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    
+      // Gráfico de Tendência de Economia
+      const savingsTrendCtx = document
+        .getElementById("savingsTrendChart")
+        .getContext("2d");
+      const savingsTrendChart = new Chart(savingsTrendCtx, {
+        type: "line",
+        data: {
+          labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
+          datasets: [
+            {
+              label: "Economia",
+              data: [1500, 1800, 2000, 2200, 2000, 2500],
+              borderColor: "rgba(75, 192, 192, 1)",
+              tension: 0.1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    
+      // Simulando dados de relatórios
+      const simulatedData = {
+        income: [15000, 14000, 16000, 17000, 16500, 18000],
+        expenses: [12000, 11000, 13000, 14000, 13500, 15000],
+        summary: {
+          "Total de Receitas": "R$ 90.000,00",
+          "Total de Despesas": "R$ 75.000,00",
+          "Saldo": "R$ 15.000,00",
+          "Categoria com Maior Gasto": "Alimentação (R$ 20.000,00)",
+          "Economia do Mês": "16,67%",
+        },
+      };
+    
+      // Adicionando o manipulador de evento para o formulário
+      document.querySelector('form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Evita o envio do formulário
+    
+        // Aqui você pode simular a lógica de filtragem com os dados fictícios
+        const reportType = document.getElementById('reportType').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+    
+        // Atualiza os gráficos com os dados simulados
+        updateCharts(simulatedData);
+        updateSummary(simulatedData.summary);
+      });
+    
+      function updateCharts(data) {
+        // Atualiza os gráficos com os novos dados
+        incomeExpenseChart.data.datasets[0].data = data.income; // Atualiza dados de receita
+        incomeExpenseChart.data.datasets[1].data = data.expenses; // Atualiza dados de despesa
+        incomeExpenseChart.update(); // Atualiza o gráfico
+    
+        // Atualize outros gráficos da mesma forma, se necessário
+        // ...
+      }
+    
+      function updateSummary(summary) {
+        // Atualiza a tabela de resumo financeiro
+        const summaryTable = document.querySelector('.table tbody');
+        summaryTable.innerHTML = ''; // Limpa a tabela
+    
+        Object.keys(summary).forEach(key => {
+          const row = document.createElement('tr');
+          const metricCell = document.createElement('td');
+          const valueCell = document.createElement('td');
+    
+          metricCell.textContent = key;
+          valueCell.textContent = summary[key];
+    
+          row.appendChild(metricCell);
+          row.appendChild(valueCell);
+          summaryTable.appendChild(row);
+        });
+      }
+    </script>
+     -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestão Financeira - Relatórios</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f4f4;
+      }
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .card {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .report-filter {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="home.html">Gestão Financeira</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="transacoes.html">Transações</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="orcamentos.html">Orçamentos</a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="relatorios.html"
+                  >Relatórios</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <h1 class="mb-4">Relatórios Financeiros</h1>
+
+      <div class="report-filter card">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Filtros de Relatório</h5>
+          <form id="reportForm" class="row g-3">
+            <div class="col-md-4">
+              <label for="reportType" class="form-label"
+                >Tipo de Relatório</label
+              >
+              <select class="form-select" id="reportType">
+                <option value="income-expense">Receitas vs Despesas</option>
+                <option value="category-breakdown">
+                  Detalhamento por Categoria
+                </option>
+                <option value="budget-performance">
+                  Desempenho do Orçamento
+                </option>
+                <option value="savings-trend">Tendência de Economia</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="dateFrom" class="form-label">Data Inicial</label>
+              <input type="date" class="form-control" id="dateFrom" required />
+            </div>
+            <div class="col-md-4">
+              <label for="dateTo" class="form-label">Data Final</label>
+              <input type="date" class="form-control" id="dateTo" required />
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">
+                Gerar Relatório
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Receitas vs Despesas</h5>
+              <canvas id="incomeExpenseChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Detalhamento por Categoria</h5>
+              <canvas id="categoryBreakdownChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Desempenho do Orçamento</h5>
+              <canvas id="budgetPerformanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Tendência de Economia</h5>
+              <canvas id="savingsTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title">Resumo Financeiro</h5>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Métrica</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody">
+              <tr>
+                <td>Total de Receitas</td>
+                <td id="totalIncome">R$ 0,00</td>
+              </tr>
+              <tr>
+                <td>Total de Despesas</td>
+                <td id="totalExpenses">R$ 0,00</td>
+              </tr>
+              <tr>
+                <td>Saldo</td>
+                <td id="balance" class="text-success">R$ 0,00</td>
+              </tr>
+              <tr>
+                <td>Categoria com Maior Gasto</td>
+                <td id="highestExpenseCategory">-</td>
+              </tr>
+              <tr>
+                <td>Economia do Mês</td>
+                <td id="monthlySavings">0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Variáveis para armazenar os gráficos
+      let incomeExpenseChart,
+        categoryBreakdownChart,
+        budgetPerformanceChart,
+        savingsTrendChart;
+
+      document
+        .getElementById("reportForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Impede o envio do formulário padrão
+          updateCharts(); // Atualiza os gráficos com dados simulados
+          updateSummary(); // Atualiza o resumo financeiro
+        });
+
+      // Função para atualizar gráficos com dados simulados
+      function updateCharts() {
+        // Dados simulados
+        const incomeData = [12000, 13000, 14000, 15000, 15000, 15000];
+        const expenseData = [10000, 11000, 12000, 12500, 13000, 12500];
+        const categoryLabels = [
+          "Alimentação",
+          "Transporte",
+          "Moradia",
+          "Entretenimento",
+          "Saúde",
+        ];
+        const categoryData = [3500, 1500, 4000, 2000, 1500];
+        const budgetedData = [3000, 2000, 4000, 1500, 2000];
+        const actualData = [3500, 1500, 4000, 2000, 1500];
+        const savingsData = [1500, 1800, 2000, 2200, 2000, 2500];
+        const labels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"];
+
+        // Gráfico de Receitas vs Despesas
+        const incomeExpenseCtx = document
+          .getElementById("incomeExpenseChart")
+          .getContext("2d");
+        if (incomeExpenseChart) incomeExpenseChart.destroy(); // Destruir gráfico anterior, se existir
+        incomeExpenseChart = new Chart(incomeExpenseCtx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Receitas",
+                data: incomeData,
+                backgroundColor: "rgba(40, 167, 69, 0.8)",
+              },
+              {
+                label: "Despesas",
+                data: expenseData,
+                backgroundColor: "rgba(220, 53, 69, 0.8)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+
+        // Gráfico de Detalhamento por Categoria
+        const categoryBreakdownCtx = document
+          .getElementById("categoryBreakdownChart")
+          .getContext("2d");
+        if (categoryBreakdownChart) categoryBreakdownChart.destroy(); // Destruir gráfico anterior, se existir
+        categoryBreakdownChart = new Chart(categoryBreakdownCtx, {
+          type: "pie",
+          data: {
+            labels: categoryLabels,
+            datasets: [
+              {
+                data: categoryData,
+                backgroundColor: [
+                  "rgba(255, 99, 132, 0.8)",
+                  "rgba(54, 162, 235, 0.8)",
+                  "rgba(255, 206, 86, 0.8)",
+                  "rgba(75, 192, 192, 0.8)",
+                  "rgba(153, 102, 255, 0.8)",
+                ],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "bottom",
+              },
+            },
+          },
+        });
+
+        // Gráfico de Desempenho do Orçamento
+        const budgetPerformanceCtx = document
+          .getElementById("budgetPerformanceChart")
+          .getContext("2d");
+        if (budgetPerformanceChart) budgetPerformanceChart.destroy(); // Destruir gráfico anterior, se existir
+        budgetPerformanceChart = new Chart(budgetPerformanceCtx, {
+          type: "bar",
+          data: {
+            labels: categoryLabels,
+            datasets: [
+              {
+                label: "Orçado",
+                data: budgetedData,
+                backgroundColor: "rgba(54, 162, 235, 0.8)",
+              },
+              {
+                label: "Real",
+                data: actualData,
+                backgroundColor: "rgba(255, 99, 132, 0.8)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+
+        // Gráfico de Tendência de Economia
+        const savingsTrendCtx = document
+          .getElementById("savingsTrendChart")
+          .getContext("2d");
+        if (savingsTrendChart) savingsTrendChart.destroy(); // Destruir gráfico anterior, se existir
+        savingsTrendChart = new Chart(savingsTrendCtx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Economia",
+                data: savingsData,
+                borderColor: "rgba(75, 192, 192, 1)",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      }
+
+      // Função para atualizar o resumo financeiro
+      function updateSummary() {
+        const totalIncome = 15000; // Exemplo de dados simulados
+        const totalExpenses = 12000; // Exemplo de dados simulados
+        const balance = totalIncome - totalExpenses;
+        const highestExpenseCategory = "Alimentação (R$ 3.500,00)";
+        const monthlySavings =
+          ((totalIncome - totalExpenses) / totalIncome) * 100;
+
+        document.getElementById(
+          "totalIncome"
+        ).innerText = `R$ ${totalIncome.toFixed(2)}`;
+        document.getElementById(
+          "totalExpenses"
+        ).innerText = `R$ ${totalExpenses.toFixed(2)}`;
+        document.getElementById("balance").innerText = `R$ ${balance.toFixed(
+          2
+        )}`;
+        document.getElementById("highestExpenseCategory").innerText =
+          highestExpenseCategory;
+        document.getElementById(
+          "monthlySavings"
+        ).innerText = `${monthlySavings.toFixed(2)}%`;
+      }
+    </script>
+  </body>
+</html>
