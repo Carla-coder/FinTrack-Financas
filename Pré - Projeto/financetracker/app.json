@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "40854059-52e0-405a-9caa-931a2b92176a"
+      }
+    },
+    "android": {
+      "package": "com.leticiadev.financetracker"
+    }
+  }
+}
