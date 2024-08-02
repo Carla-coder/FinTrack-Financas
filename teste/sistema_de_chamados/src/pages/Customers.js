@@ -1,204 +1,168 @@
-import React, { useState } from 'react';
-import Title from '../components/Title';
-import { FiPlus } from 'react-icons/fi';
-import Modal from '../components/Modal';
+import { useState } from "react";
+import Title from "../components/Title";
+import Header from "../components/Header";
+import firebase from "../services/firebaseConnection";
+import { FiUser } from "react-icons/fi";
+import { toast } from "react-toastify";
 
-const Customers = () => {
-  const [customers, setCustomers] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [newCustomer, setNewCustomer] = useState({ name: '', cnpj: '', address: '' });
+export default function Customers() {
+  const [nomeFantasia, setNomeFantasia] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [endereco, setEndereco] = useState("");
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewCustomer({ ...newCustomer, [name]: value });
-  };
-
-  const addCustomer = () => {
-    if (newCustomer.name && newCustomer.cnpj && newCustomer.address) {
-      setCustomers([...customers, newCustomer]);
-      setNewCustomer({ name: '', cnpj: '', address: '' });
-      setShowModal(false);
+  async function handleAdd(e) {
+    e.preventDefault();
+    if (nomeFantasia !== "" && cnpj !== "" && endereco !== "") {
+      await firebase
+        .firestore()
+        .collection("customers")
+        .add({
+          nomeFantasia: nomeFantasia,
+          cnpj: cnpj,
+          endereco: endereco,
+        })
+        .then(() => {
+          setNomeFantasia("");
+          setCnpj("");
+          setEndereco("");
+          toast.success("Empresa cadastrada com sucesso!");
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error("Erro ao cadastrar essa empresa");
+        });
     } else {
-      alert('Please fill in all fields');
+      toast.error("Preencha todos os campos!");
     }
-  };
-
-  const handleAddClick = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  }
 
   return (
-    <div style={styles.dashboard}>
-      <Title name="Customers" style={styles.title}>
-        <FiPlus size={25} color="#fff" />
-      </Title>
-      <div style={styles.container}>
-        <div style={styles.tableContainer}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Name</th>
-                <th style={styles.th}>CNPJ</th>
-                <th style={styles.th}>Address</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((customer, index) => (
-                <tr key={index}>
-                  <td style={styles.td}>{customer.name}</td>
-                  <td style={styles.td}>{customer.cnpj}</td>
-                  <td style={styles.td}>{customer.address}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div style={styles.customers}>
+      <Header />
+      <div style={styles.content}>
+        <Title name="Clientes">
+          <FiUser size={25} />
+        </Title>
+        <div style={styles.container}>
+          <form style={styles.form} onSubmit={handleAdd}>
+            <label style={styles.label}>Nome do Cliente</label>
+            <input
+              type="text"
+              placeholder="Nome da sua empresa"
+              value={nomeFantasia}
+              onChange={(e) => setNomeFantasia(e.target.value)}
+              style={styles.input}
+            />
+            <label style={styles.label}>CNPJ</label>
+            <input
+              type="text"
+              placeholder="Seu CNPJ"
+              value={cnpj}
+              onChange={(e) => setCnpj(e.target.value)}
+              style={styles.input}
+            />
+            <label style={styles.label}>Endereço</label>
+            <input
+              type="text"
+              placeholder="Endereço da empresa"
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              style={styles.input}
+            />
+            <button type="submit" style={styles.button}>Cadastrar</button>
+          </form>
         </div>
-        {showModal && (
-          <Modal isOpen={showModal} close={handleCloseModal} onSave={addCustomer} content={
-            <>
-              <h2 style={styles.modalTitle}>Add Customer</h2>
-              <label style={styles.label}>
-                Name:
-                <input
-                  type="text"
-                  name="name"
-                  value={newCustomer.name}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                />
-              </label>
-              <label style={styles.label}>
-                CNPJ:
-                <input
-                  type="text"
-                  name="cnpj"
-                  value={newCustomer.cnpj}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                />
-              </label>
-              <label style={styles.label}>
-                Address:
-                <input
-                  type="text"
-                  name="address"
-                  value={newCustomer.address}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                />
-              </label>
-            </>
-          } />
-        )}
       </div>
-      <button style={styles.addButton} onClick={handleAddClick}>
-        <FiPlus size={30} color="#FFF" />
-      </button>
     </div>
   );
-};
+}
 
 const styles = {
-  dashboard: {
+  customers: {
     background: 'linear-gradient(135deg, #2c3e50, #3498db)',
     color: '#fff',
-    position: 'relative',
-    paddingBottom: '80px',
     minHeight: '100vh',
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
+    padding: '20px',
+    boxSizing: 'border-box',
   },
-  title: {
-    marginBottom: '20px',
+  content: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: '1000px',
+    margin: '0 auto',
+    padding: '20px',
+    flexGrow: 1,
   },
   container: {
-    margin: '20px',
-    textAlign: 'center',
-  },
-  tableContainer: {
-    margin: '20px auto',
-    maxWidth: '80%',
-    overflowX: 'auto',
+    width: '90%',
+    maxWidth: '90%',
+    padding: '20px',
     borderRadius: '12px',
-    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.3)',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
     backgroundColor: '#2c3e50',
-    color: '#fff',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+    marginLeft: '-10px', // Adicione esta linha para mover o contêiner para a esquerda
   },
-  th: {
-    background: 'linear-gradient(135deg, #ff5722, #ff9800)',
-    color: '#fff',
-    padding: '16px',
-    textAlign: 'left',
-    borderBottom: '2px solid #444',
-  },
-  td: {
-    padding: '16px',
-    textAlign: 'left',
-    borderBottom: '1px solid #444',
-  },
-  addButton: {
-    position: 'fixed',
-    bottom: '120px',
-    right: '100px',
-    backgroundColor: '#ff5722',
-    color: '#fff',
-    borderRadius: '50%',
-    width: '60px',
-    height: '60px',
+  form: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-    border: 'none',
-    fontSize: '24px',
-    cursor: 'pointer',
-  },
-  modalTitle: {
-    marginBottom: '15px',
+    flexDirection: 'column',
   },
   label: {
-    display: 'block',
-    marginBottom: '10px',
+    marginBottom: '8px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    color: '#ff5722',
   },
   input: {
-    display: 'block',
-    width: '100%',
-    padding: '10px',
-    marginTop: '5px',
-    borderRadius: '5px',
-    border: '1px solid #ddd',
+    marginBottom: '16px',
+    padding: '12px',
+    fontSize: '16px',
+    borderRadius: '8px',
+    border: '1px solid #444',
+    backgroundColor: '#fff',
+    color: '#333',
+    boxSizing: 'border-box',
   },
-  modalButtons: {
-    marginTop: '20px',
-  },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-    color: '#fff',
-    border: 'none',
-    padding: '12px 24px',
-    borderRadius: '5px',
-    cursor: 'pointer',
+  button: {
+    padding: '12px',
     fontSize: '18px',
-    marginRight: '10px',
-  },
-  cancelButton: {
-    backgroundColor: '#f44336',
-    color: '#fff',
+    borderRadius: '8px',
     border: 'none',
-    padding: '12px 24px',
-    borderRadius: '5px',
+    backgroundColor: '#ff5722',
+    color: '#fff',
     cursor: 'pointer',
-    fontSize: '18px',
+    transition: 'background-color 0.3s',
+  },
+  '@media (max-width: 768px)': {
+    container: {
+      padding: '15px',
+      maxWidth: '90%',
+      marginLeft: '-5px', // Ajuste também para dispositivos menores, se necessário
+    },
+    input: {
+      fontSize: '14px',
+      padding: '10px',
+    },
+    button: {
+      fontSize: '16px',
+      padding: '10px',
+    },
+  },
+  '@media (max-width: 480px)': {
+    container: {
+      padding: '10px',
+      maxWidth: '95%',
+      marginLeft: '0', // Remova margem negativa para dispositivos menores
+    },
+    input: {
+      fontSize: '12px',
+      padding: '8px',
+    },
+    button: {
+      fontSize: '14px',
+      padding: '8px',
+    },
   }
 };
-
-export default Customers;
