@@ -5,10 +5,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const New = () => {
   const { id } = useParams();
-  const [name, setName] = useState('');
   const [material, setMaterial] = useState('');
   const [status, setStatus] = useState('');
   const [complement, setComplement] = useState('');
+  const [clientId, setClientId] = useState('');
+  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -17,10 +18,10 @@ const New = () => {
       if (id) {
         await firebase.firestore().collection('products').doc(id).get()
           .then(snapshot => {
-            setName(snapshot.data().name);
             setMaterial(snapshot.data().material);
             setStatus(snapshot.data().status);
             setComplement(snapshot.data().complement);
+            setClientId(snapshot.data().clientId || '');
           })
           .catch(err => console.log('Error:', err));
       }
@@ -28,13 +29,33 @@ const New = () => {
     loadProduct();
   }, [id]);
 
+  useEffect(() => {
+    async function loadClients() {
+      try {
+        const snapshot = await firebase.firestore().collection('customers').get();
+        let clientList = [];
+        snapshot.forEach(doc => {
+          clientList.push({ id: doc.id, ...doc.data() });
+        });
+        setClients(clientList);
+      } catch (err) {
+        console.log('Error:', err);
+      }
+    }
+    loadClients();
+  }, []);
+
   async function handleSave() {
     setLoading(true);
+    const selectedClient = clients.find(client => client.id === clientId);
+    const clientName = selectedClient ? selectedClient.nomeFantasia : 'Cliente Desconhecido';
+
     const data = {
-      name,
       material,
       status,
       complement,
+      clientId,
+      clientName, // Adicione o nome do cliente aqui
       created: new Date(),
     };
 
@@ -56,14 +77,20 @@ const New = () => {
       <Title name={id ? 'Edit Product' : 'Novo Produto'} />
       <div style={styles.formContainer}>
         <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} style={styles.form}>
-          <label style={styles.label}>Nome do Cliente:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+          <label style={styles.label}>Cliente:</label>
+          <select
+            value={clientId}
+            onChange={(e) => setClientId(e.target.value)}
             required
-            style={styles.input}
-          />
+            style={styles.select}
+          >
+            <option value="">Selecione um Cliente</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.nomeFantasia} - {client.cnpj}
+              </option>
+            ))}
+          </select>
           <label style={styles.label}>Serviço:</label>
           <input
             type="text"
@@ -91,7 +118,7 @@ const New = () => {
             style={styles.textarea}
           />
           <button type="submit" disabled={loading} style={styles.button}>
-            {loading ? 'Salvo...' : 'Salvar'}
+            {loading ? 'Salvando...' : 'Salvar'}
           </button>
         </form>
       </div>
@@ -102,7 +129,7 @@ const New = () => {
 const styles = {
   container: {
     background: 'linear-gradient(135deg, #2c3e50, #3498db)',
-    color: '#fff', 
+    color: '#fff',
     minHeight: '100vh',
     padding: '20px',
     boxSizing: 'border-box',
@@ -111,7 +138,7 @@ const styles = {
     maxWidth: '800px',
     margin: '0 auto',
     padding: '20px',
-    background: '#2c3e50', // Fundo do formulário escuro
+    background: '#2c3e50',
     borderRadius: '8px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
   },
@@ -130,8 +157,8 @@ const styles = {
     borderRadius: '4px',
     marginBottom: '16px',
     fontSize: '16px',
-    background: '#333', // Fundo dos inputs
-    color: '#fff', // Texto branco
+    background: '#333',
+    color: '#fff',
   },
   select: {
     padding: '12px',
@@ -139,8 +166,8 @@ const styles = {
     borderRadius: '4px',
     marginBottom: '16px',
     fontSize: '16px',
-    background: '#333', // Fundo do select
-    color: '#fff', // Texto branco
+    background: '#333',
+    color: '#fff',
   },
   textarea: {
     padding: '12px',
@@ -148,12 +175,12 @@ const styles = {
     borderRadius: '4px',
     marginBottom: '16px',
     fontSize: '16px',
-    background: '#333', // Fundo do textarea
-    color: '#fff', // Texto branco
+    background: '#333',
+    color: '#fff',
     resize: 'vertical',
   },
   button: {
-    backgroundColor: '#ff5722', // Cor laranja para o botão
+    backgroundColor: '#ff5722',
     color: '#fff',
     border: 'none',
     padding: '12px',

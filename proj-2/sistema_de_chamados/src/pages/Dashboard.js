@@ -3,7 +3,7 @@ import Title from '../components/Title';
 import Modal from '../components/Modal';
 import { FiPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import firebase from '../services/firebaseConnection'; 
+import firebase from '../services/firebaseConnection';
 
 const listRef = firebase.firestore().collection('products').orderBy('created', 'desc');
 
@@ -22,7 +22,7 @@ const Dashboard = () => {
         const snapshot = await listRef.limit(5).get();
         updateState(snapshot);
       } catch (err) {
-        console.log('Error:', err);
+        console.error('Error loading products:', err);
       } finally {
         setLoading(false);
       }
@@ -43,6 +43,7 @@ const Dashboard = () => {
           createdFormatted: new Date(doc.data().created.seconds * 1000).toLocaleDateString(),
           status: doc.data().status,
           complement: doc.data().complement,
+          clientName: doc.data().clientName || 'Cliente Desconhecido', // Inclui o nome do cliente
         });
       });
       const lastDoc = snapshot.docs[snapshot.docs.length - 1];
@@ -60,7 +61,7 @@ const Dashboard = () => {
       const snapshot = await listRef.startAfter(lastDocs).limit(5).get();
       updateState(snapshot);
     } catch (err) {
-      console.log('Error:', err);
+      console.error('Error loading more products:', err);
     }
   }
 
@@ -72,7 +73,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div style={styles.dashboard}>
-        <Title name="Atendimento" style={styles.title}></Title>
+        <Title name="Atendimento" style={styles.title} />
         <div style={styles.container}>
           <span>Loading...</span>
         </div>
@@ -82,7 +83,7 @@ const Dashboard = () => {
 
   return (
     <div style={styles.dashboard}>
-      <Title name="Atendimento" style={styles.title}></Title>
+      <Title name="Atendimento" style={styles.title} />
       {products.length === 0 ? (
         <div style={styles.container}>
           <span>Nenhum Produto Encontrado</span>
@@ -93,8 +94,8 @@ const Dashboard = () => {
             <table style={styles.table}>
               <thead>
                 <tr>
-                  <th style={styles.th}>Nome</th>
-                  <th style={styles.th}>Serviço</th>
+                <th style={styles.th}>Cliente</th> {}
+                  <th style={styles.th}>Material</th>
                   <th style={styles.th}>Data</th>
                   <th style={styles.th}>Status</th>
                   <th style={styles.th}>Ações</th>
@@ -103,7 +104,7 @@ const Dashboard = () => {
               <tbody>
                 {products.map((item) => (
                   <tr key={item.id}>
-                    <td style={styles.td}>{item.name}</td>
+                    <td style={styles.td}>{item.clientName}</td> {}
                     <td style={styles.td}>{item.material}</td>
                     <td style={styles.td}>{item.createdFormatted}</td>
                     <td style={styles.statusCell}>
@@ -121,7 +122,7 @@ const Dashboard = () => {
               </tbody>
             </table>
           </div>
-          {loadingMore && <span style={styles.loadingMore}>Buscando</span>}
+          {loadingMore && <span style={styles.loadingMore}>Buscando...</span>}
           {!loadingMore && !isEmpty && (
             <button style={styles.loadMore} onClick={handleMore}>Buscar Mais</button>
           )}
@@ -130,7 +131,7 @@ const Dashboard = () => {
       <Link to="/new" style={styles.addProduct}>
         <FiPlus size={30} />
       </Link>
-      {showPostModal && <Modal content={detail} close={() => setShowPostModal(false)} onSave={() => { /* Handle save action if needed */ }} />}
+      {showPostModal && <Modal content={detail} close={() => setShowPostModal(false)} onSave={() => { }} />}
     </div>
   );
 };
