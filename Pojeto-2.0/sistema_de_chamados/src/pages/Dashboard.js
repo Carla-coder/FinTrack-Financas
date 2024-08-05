@@ -83,44 +83,29 @@ const Dashboard = () => {
 
   return (
     <div style={styles.dashboard}>
-      <Title name=" Chamados" style={styles.title} />
+      <Title name="Chamados" style={styles.title} />
       {products.length === 0 ? (
         <div style={styles.container}>
           <span>Nenhum Produto Encontrado</span>
         </div>
       ) : (
         <>
-          <div style={styles.tableContainer}>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                <th style={styles.th}>Cliente</th> {}
-                  <th style={styles.th}>Serviço</th>
-                  <th style={styles.th}>Data</th>
-                  <th style={styles.th}>Status</th>
-                  <th style={styles.th}>Relação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((item) => (
-                  <tr key={item.id}>
-                    <td style={styles.td}>{item.clientName}</td> {}
-                    <td style={styles.td}>{item.material}</td>
-                    <td style={styles.td}>{item.createdFormatted}</td>
-                    <td style={styles.statusCell}>
-                      <span style={styles.status[item.status]}>
-                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                      </span>
-                    </td>
-                    <td style={styles.actionsCell}>
-                      <button style={styles.actionButton} onClick={() => togglePostModal(item)}>
-                        Detalhes
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={styles.cardsContainer}>
+            {products.map((item) => (
+              <div key={item.id} style={styles.card}>
+                <h3 style={styles.cardTitle}>{item.clientName}</h3>
+                <p><strong>Serviço:</strong> {item.material}</p>
+                <p><strong>Data:</strong> {item.createdFormatted}</p>
+                <p><strong>Status:</strong> 
+                  <span style={styles.status[item.status]}>
+                    {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                  </span>
+                </p>
+                <button style={styles.actionButton} onClick={() => togglePostModal(item)}>
+                  Detalhes
+                </button>
+              </div>
+            ))}
           </div>
           {loadingMore && <span style={styles.loadingMore}>Buscando...</span>}
           {!loadingMore && !isEmpty && (
@@ -146,63 +131,51 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    padding: '10px',
   },
   container: {
     margin: '20px',
     textAlign: 'center',
   },
-  tableContainer: {
-    margin: '20px auto',
-    maxWidth: '80%', 
-    overflowX: 'auto',
-    borderRadius: '12px',
-    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.3)',
+  cardsContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: '20px',
+    maxWidth: '1000px',
+    margin: '0 auto',
   },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
+  card: {
     backgroundColor: '#2c3e50',
-    color: '#fff', 
-  },
-  th: {
-    background: 'linear-gradient(135deg, #ff5722, #ff9800)', 
     color: '#fff',
-    padding: '16px', 
+    padding: '20px',
+    borderRadius: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+    width: '200px',
     textAlign: 'left',
-    borderBottom: '2px solid #444', 
   },
-  td: {
-    padding: '16px', 
-    textAlign: 'left',
-    borderBottom: '1px solid #444',
-  },
-  statusCell: {
-    padding: '16px',
-    textAlign: 'left',
+  cardTitle: {
+    margin: '0 0 10px',
   },
   status: {
     atendido: {
       backgroundColor: '#4CAF50', 
       color: '#fff',
-      padding: '8px',
+      padding: '4px 8px',
       borderRadius: '4px',
     },
     emProgresso: {
       backgroundColor: '#FFC107', 
       color: '#000',
-      padding: '8px',
+      padding: '4px 8px',
       borderRadius: '4px',
     },
     concluido: {
       backgroundColor: '#2196F3',
       color: '#fff',
-      padding: '8px',
+      padding: '4px 8px',
       borderRadius: '4px',
     },
-  },
-  actionsCell: {
-    width: '120px',
-    textAlign: 'center',
   },
   actionButton: {
     backgroundColor: '#ff5722',
@@ -213,6 +186,7 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     transition: 'background-color 0.3s',
+    marginTop: '10px',
   },
   loadMore: {
     backgroundColor: '#ff5722',
@@ -222,11 +196,12 @@ const styles = {
     borderRadius: '5px',
     cursor: 'pointer',
     fontSize: '18px',
+    marginTop: '20px',
   },
   addProduct: {
     position: 'fixed',
-    bottom: '120px',
-    right: '100px',
+    bottom: '110px',
+    right: '20px',
     backgroundColor: '#ff5722',
     color: '#fff',
     borderRadius: '50%',

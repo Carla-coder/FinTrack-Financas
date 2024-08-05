@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "1df9cda4-d7a7-461b-b2ed-4a3bc2bab039"
+      }
+    },
+    "android": {
+      "package": "com.leticiadev.sistema_de_chamados"
+    }
+  }
+}
