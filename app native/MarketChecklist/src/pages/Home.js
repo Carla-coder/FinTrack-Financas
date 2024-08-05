@@ -209,10 +209,11 @@
 // export default Home;
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const Home = () => {
   const [newItem, setNewItem] = useState('');
@@ -291,54 +292,62 @@ const Home = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Lista de Compras:</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome do item"
-          value={newItem}
-          onChangeText={setNewItem}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Quantidade"
-          value={quantity}
-          onChangeText={setQuantity}
-        />
-        <Button title={editId ? "Atualizar Item" : "Adicionar Item"} onPress={addItem} color="#2A5D34" />
-      </View>
-      <View style={styles.listContainer}>
-        <FlatList
-          data={items}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.itemContainer}>
-              <Text style={[styles.itemText, item.bought && styles.itemBought]}>{item.name} - {item.quantity}</Text>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => editItem(item.id)} style={styles.editButton}>
-                  <Text style={styles.buttonText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteItem(item.id)} style={styles.deleteButton}>
-                  <Text style={styles.buttonText}>Excluir</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => toggleBought(item.id)} style={styles.button}>
-                  <Text style={styles.buttonText}>{item.bought ? "Desmarcar" : "Marcar como Comprado"}</Text>
-                </TouchableOpacity>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Lista de Compras:</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome do item"
+            value={newItem}
+            onChangeText={setNewItem}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Quantidade"
+            value={quantity}
+            onChangeText={setQuantity}
+          />
+          <Button title={editId ? "Atualizar" : "Adicionar"} onPress={addItem} color="#2A5D34" />
+        </View>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={items}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.itemContainer}>
+                <Text style={[styles.itemText, item.bought && styles.itemBought]}>{item.name} - {item.quantity}</Text>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity onPress={() => editItem(item.id)} style={styles.iconButton}>
+                    <Icon name="edit" size={20} color="#FFD700" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => deleteItem(item.id)} style={styles.iconButton}>
+                    <Icon name="trash" size={20} color="#FF6347" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => toggleBought(item.id)} style={styles.iconButton}>
+                    <Icon name={item.bought ? "check-square" : "square-o"} size={20} color="#2A5D34" />
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          )}
-        />
+            )}
+          />
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     padding: 20,
     backgroundColor: '#F2F2F2',
+    width: '100%',
   },
   title: {
     fontSize: width > 400 ? 24 : 20, 
@@ -350,18 +359,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    width: '100%',
   },
   input: {
     flex: 1,
     borderColor: '#A8D5BA',
     borderWidth: 1,
-    marginRight: 10,
+    marginRight: 20,
     padding: 8,
+    width: '90%',
     fontSize: width > 400 ? 16 : 14, 
     borderRadius: 5,
   },
   listContainer: {
     flex: 1,
+    width: '105%',
     maxHeight: 300, // Define uma altura máxima para o contêiner da lista
     backgroundColor: '#FFF',
     borderRadius: 5,
@@ -387,32 +399,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  button: {
+  iconButton: {
     marginLeft: 10,
-    padding: 10,
-    backgroundColor: '#A8D5BA', 
-    borderRadius: 5,
-  },
-  editButton: {
-    marginLeft: 10,
-    padding: 10,
-    backgroundColor: '#FFD700', 
-    borderRadius: 5,
-  },
-  deleteButton: {
-    marginLeft: 10,
-    padding: 10,
-    backgroundColor: '#FF6347', 
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#2A5D34',
-    fontWeight: 'bold',
   },
 });
 
 export default Home;
-
 
 
 
