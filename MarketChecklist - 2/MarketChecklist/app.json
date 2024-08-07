@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "06edffd3-7542-4ea9-ad02-c36457047972"
+      }
+    },
+    "android": {
+      "package": "com.leticiadev.marketchecklist"
+    }
+  }
+}
