@@ -2,11 +2,11 @@
   "expo": {
     "extra": {
       "eas": {
-        "projectId": "8c5a7b1b-e1ba-42b4-9468-a0f8fef1672b"
+        "projectId": "06edffd3-7542-4ea9-ad02-c36457047972"
       }
     },
     "android": {
-      "package": "com.carlacoder.marketchecklist"
+      "package": "com.leticiadev.marketchecklist"
     }
   }
 }
