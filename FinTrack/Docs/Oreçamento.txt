@@ -1,0 +1,18 @@
+		
+		ORÇAMENTO:
+
+	-> Design = 8 horas = 240,00
+
+	-> Back e banco = 120 horas = 3600,00
+
+	-> Front = 90 horas = 2700,00
+
+	-> Mobile = 180 horas = 5400,00
+
+	-> Integração = 120 horas = 3600,00
+
+	-> Documentação = 36 horas = 1080,00
+
+	-> Testes = 40 horas = 1200,00
+
+	-> Total = 17.820,00

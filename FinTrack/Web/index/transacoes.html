@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestão Financeira - Transações</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f4f4;
+      }
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .card {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .btn-add {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-container">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Gestão Financeira</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="dashboard.html">Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="transacoes.html"
+                  >Transações</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="orcamentos.html">Orçamentos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#relatorios.html">Relatórios</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Seção de Transações -->
+      <div id="transactions">
+        <h2 class="mb-4">Transações</h2>
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Lista de Transações</h5>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Valor</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="transactionTableBody">
+                <!-- As transações serão renderizadas aqui -->
+              </tbody>
+            </table>
+            <nav aria-label="Navegação de página">
+              <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                  <a
+                    class="page-link"
+                    href="#"
+                    tabindex="-1"
+                    aria-disabled="true"
+                    >Anterior</a
+                  >
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a class="page-link" href="#">Próxima</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        <button
+          class="btn btn-primary btn-lg rounded-circle btn-add"
+          data-bs-toggle="modal"
+          data-bs-target="#addTransactionModal"
+        >
+          +
+        </button>
+      </div>
+
+      <!-- Modal para adicionar transação -->
+      <div
+        class="modal fade"
+        id="addTransactionModal"
+        tabindex="-1"
+        aria-labelledby="addTransactionModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addTransactionModalLabel">
+                Adicionar Transação
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="transactionForm">
+                <div class="mb-3">
+                  <label for="transactionDate" class="form-label">Data</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="transactionDate"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="transactionDescription" class="form-label"
+                    >Descrição</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="transactionDescription"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="transactionCategory" class="form-label"
+                    >Categoria</label
+                  >
+                  <select class="form-select" id="transactionCategory" required>
+                    <option value="">Selecione uma categoria</option>
+                    <option value="renda">Renda</option>
+                    <option value="alimentacao">Alimentação</option>
+                    <option value="transporte">Transporte</option>
+                    <option value="utilidades">Utilidades</option>
+                    <option value="entretenimento">Entretenimento</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="transactionAmount" class="form-label"
+                    >Valor</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="transactionAmount"
+                    step="0.01"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="saveTransaction"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal para editar transação -->
+      <div
+        class="modal fade"
+        id="editTransactionModal"
+        tabindex="-1"
+        aria-labelledby="editTransactionModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editTransactionModalLabel">
+                Editar Transação
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="editTransactionForm">
+                <div class="mb-3">
+                  <label for="editTransactionDate" class="form-label"
+                    >Data</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="editTransactionDate"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="editTransactionDescription" class="form-label"
+                    >Descrição</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editTransactionDescription"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="editTransactionCategory" class="form-label"
+                    >Categoria</label
+                  >
+                  <select
+                    class="form-select"
+                    id="editTransactionCategory"
+                    required
+                  >
+                    <option value="">Selecione uma categoria</option>
+                    <option value="renda">Renda</option>
+                    <option value="alimentacao">Alimentação</option>
+                    <option value="transporte">Transporte</option>
+                    <option value="utilidades">Utilidades</option>
+                    <option value="entretenimento">Entretenimento</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="editTransactionAmount" class="form-label"
+                    >Valor</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="editTransactionAmount"
+                    step="0.01"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="updateTransaction"
+              >
+                Atualizar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script>
+        // Array para armazenar transações
+        let transactions = [
+          {
+            date: "2023-06-20",
+            description: "Uber",
+            category: "transporte",
+            amount: -50,
+          },
+          {
+            date: "2023-06-25",
+            description: "Conta de Luz",
+            category: "utilidades",
+            amount: -120,
+          },
+          {
+            date: "2023-07-01",
+            description: "Cinema",
+            category: "entretenimento",
+            amount: -80,
+          },
+          {
+            date: "2023-07-05",
+            description: "Jantar com amigos",
+            category: "alimentacao",
+            amount: -200,
+          },
+          {
+            date: "2023-07-07",
+            description: "Venda de Artesanato",
+            category: "renda",
+            amount: 300,
+          },
+        ];
+
+        // Função para renderizar transações
+        function renderTransactions(filteredTransactions) {
+          const tableBody = document.getElementById("transactionTableBody");
+          tableBody.innerHTML = ""; // Limpa a tabela existente
+
+          filteredTransactions.forEach((transaction) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${transaction.date}</td>
+              <td>${transaction.description}</td>
+              <td>${transaction.category}</td>
+              <td>${transaction.amount.toFixed(2)}</td>
+              <td>
+                <button class="btn btn-danger btn-sm" onclick="deleteTransaction('${
+                  transaction.date
+                }', '${transaction.description}')">Excluir</button>
+                <button class="btn btn-warning btn-sm" onclick="editTransaction('${
+                  transaction.date
+                }', '${transaction.description}')">Editar</button>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+        }
+
+        // Função para editar transações
+        function editTransaction(date, description) {
+          const transaction = transactions.find(
+            (t) => t.date === date && t.description === description
+          );
+
+          if (transaction) {
+            document.getElementById("editTransactionDate").value =
+              transaction.date;
+            document.getElementById("editTransactionDescription").value =
+              transaction.description;
+            document.getElementById("editTransactionCategory").value =
+              transaction.category;
+            document.getElementById("editTransactionAmount").value =
+              transaction.amount.toFixed(2);
+
+            const modal = new bootstrap.Modal(
+              document.getElementById("editTransactionModal")
+            );
+            modal.show();
+
+            // Atualiza a transação ao clicar no botão "Atualizar"
+            document.getElementById("updateTransaction").onclick = function () {
+              transaction.date = document.getElementById(
+                "editTransactionDate"
+              ).value;
+              transaction.description = document.getElementById(
+                "editTransactionDescription"
+              ).value;
+              transaction.category = document.getElementById(
+                "editTransactionCategory"
+              ).value;
+              transaction.amount = parseFloat(
+                document.getElementById("editTransactionAmount").value
+              );
+
+              renderTransactions(transactions); // Atualiza a tabela
+              const modal = bootstrap.Modal.getInstance(
+                document.getElementById("editTransactionModal")
+              );
+              modal.hide(); // Fecha o modal
+            };
+          }
+        }
+
+        // Manipulador de eventos para salvar transações
+        document
+          .getElementById("saveTransaction")
+          .addEventListener("click", () => {
+            const date = document.getElementById("transactionDate").value;
+            const description = document.getElementById(
+              "transactionDescription"
+            ).value;
+            const category = document.getElementById(
+              "transactionCategory"
+            ).value;
+            const amount = parseFloat(
+              document.getElementById("transactionAmount").value
+            );
+
+            if (date && description && category && !isNaN(amount)) {
+              transactions.push({ date, description, category, amount });
+              renderTransactions(transactions); // Atualiza a tabela
+              document.getElementById("transactionForm").reset(); // Limpa o formulário
+              const modal = bootstrap.Modal.getInstance(
+                document.getElementById("addTransactionModal")
+              );
+              modal.hide(); // Fecha o modal
+            }
+          });
+
+        // Função para excluir transações
+        function deleteTransaction(date, description) {
+          const index = transactions.findIndex(
+            (t) => t.date === date && t.description === description
+          );
+          if (index !== -1) {
+            transactions.splice(index, 1);
+            renderTransactions(transactions); // Atualiza a tabela
+          }
+        }
+
+        // Renderiza todas as transações inicialmente
+        renderTransactions(transactions);
+      </script>
+    </div>
+  </body>
+</html>

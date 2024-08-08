@@ -1696,7 +1696,7 @@
     json5 "^2.2.2"
     write-file-atomic "^2.3.0"
 
-"@expo/metro-config@0.18.10", "@expo/metro-config@~0.18.6":
+"@expo/metro-config@0.18.10", "@expo/metro-config@^0.18.10", "@expo/metro-config@~0.18.6":
   version "0.18.10"
   resolved "https://registry.yarnpkg.com/@expo/metro-config/-/metro-config-0.18.10.tgz#2b0ec353c38802dd89028432c3a463804df94f24"
   integrity sha512-HTYQqKfV0JSuRp5aDvrPHezj5udXOWoXqHOjfTSnce2m13j6D0yYXTJNaKRhlgpPBrkg5DL7z1fL3zwDUpLM4w==
