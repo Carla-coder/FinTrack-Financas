@@ -93,11 +93,6 @@ enum CategoriaEnum {
   TRANSPORTE
   UTILIDADES
   ENTRETENIMENTO
-  SAUDE
-  EDUCACAO
-  LAZER
-  VESTUARIO
-  HABITACAO
 }
 
 enum TipoCategoriaEnum {
