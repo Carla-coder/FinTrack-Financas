@@ -1,0 +1,42 @@
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+h1{
+    font-weight: bold;
+    text-align: center;
+    font-size: 3vh;
+}
+.register-container {
+    max-width: 400px;
+    width: 100%;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.register-container h1 {
+    margin-bottom: 20px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.welcome-message {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+}
+.logo {
+    display: block;
+    margin: 0 auto 20px auto; 
+    width: 100px; 
+}
+.input-group-text {
+    cursor: pointer;
+}

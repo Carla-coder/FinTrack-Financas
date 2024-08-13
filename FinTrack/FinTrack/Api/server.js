@@ -1,10 +1,18 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const usuarioRoutes = require('./src/routes');
 
-app.use(express.json()); 
-app.use('/api', usuarioRoutes); 
+// Configurar o middleware CORS
+app.use(cors());
 
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
+// Configurar o Express para usar JSON
+app.use(express.json());
+
+// Usar as rotas
+app.use('/api', usuarioRoutes);
+
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
