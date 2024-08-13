@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Button, Modal, TextInput, Touchable
 import { ProgressBar, Colors } from 'react-native-paper';
 import { PieChart } from 'react-native-chart-kit';
 
-export default function Orcamentos() {
+export default function BudgetsScreen() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [category, setCategory] = React.useState('');
   const [amount, setAmount] = React.useState('');
@@ -12,21 +12,30 @@ export default function Orcamentos() {
     'Transporte': { budget: 500, spent: 425 },
     'Entretenimento': { budget: 300, spent: 330 },
     'Utilidades': { budget: 500, spent: 250 },
-  });a
+  });
 
-  const handleAddBudget = () => {
-    if (category && !isNaN(amount)) {
-        const updatedBudgets = { ...budgets };
-        if (!updatedBudgets[category]) {
-            updatedBudgets[category] = { budget: 0, spent: 0 }; // Adiciona nova categoria se não existir
-        }
-        updatedBudgets[category].spent += parseFloat(amount);
-        setBudgets(updatedBudgets);
-        setModalVisible(false);
-    } else {
-        Alert.alert('Erro', 'Por favor, preencha todos os campos corretamente.');
+  // const handleAddBudget = () => {
+  //   if (category && !isNaN(amount)) {
+  //     const updatedBudgets = { ...budgets };
+  //     updatedBudgets[category].spent += parseFloat(amount);
+  //     setBudgets(updatedBudgets);
+  //     setModalVisible(false);
+  //   } else {
+  //     Alert.alert('Erro', 'Por favor, preencha todos os campos corretamente.');
+  //   }
+  // };
+
+  if (category && !isNaN(amount)) {
+    const updatedBudgets = { ...budgets };
+    if (!updatedBudgets[category]) {
+      updatedBudgets[category] = { budget: 0, spent: 0 };
     }
-};
+    updatedBudgets[category].spent += parseFloat(amount);
+    setBudgets(updatedBudgets);
+    setModalVisible(false);
+  }
+  
+
   const chartData = Object.keys(budgets).map(key => ({
     name: key,
     amount: budgets[key].budget,
