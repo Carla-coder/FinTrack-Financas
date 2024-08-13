@@ -5,17 +5,6 @@ const prisma = new PrismaClient();
 const createSubcategoria = async (req, res) => {
     try {
         const { categoriaId, nome } = req.body;
-
-        // Verificar se a categoria existe
-        const categoria = await prisma.categoria.findUnique({
-            where: { id: categoriaId }
-        });
-
-        if (!categoria) {
-            return res.status(404).json({ message: 'Categoria não encontrada' });
-        }
-
-        // Criar nova subcategoria
         const subcategoria = await prisma.subcategoria.create({
             data: {
                 categoriaId: categoriaId,
@@ -24,7 +13,6 @@ const createSubcategoria = async (req, res) => {
         });
         return res.status(201).json(subcategoria);
     } catch (error) {
-        // Captura de erros gerais
         return res.status(400).json({ message: error.message });
     }
 };
@@ -47,27 +35,13 @@ const updateSubcategoria = async (req, res) => {
     const { id } = req.params;
     try {
         const { categoriaId, nome } = req.body;
-
-        // Verificar se a categoria existe
-        const categoria = await prisma.categoria.findUnique({
-            where: { id: categoriaId }
-        });
-
-        if (!categoria) {
-            return res.status(404).json({ message: 'Categoria não encontrada' });
-        }
-
-        // Atualizar subcategoria
         const subcategoria = await prisma.subcategoria.update({
             where: { id: parseInt(id, 10) },
-            data: {
-                categoriaId: categoriaId,
-                nome: nome
-            }
+            data: { categoriaId: categoriaId, nome: nome }
         });
         return res.status(202).json(subcategoria);
     } catch (error) {
-        return res.status(404).json({ message: 'Subcategoria não encontrada' });
+        return res.status(404).json({ message: "Subcategoria não encontrada" });
     }
 };
 
@@ -80,7 +54,7 @@ const deleteSubcategoria = async (req, res) => {
         });
         return res.status(204).send();
     } catch (error) {
-        return res.status(404).json({ message: 'Subcategoria não encontrada' });
+        return res.status(404).json({ message: "Subcategoria não encontrada" });
     }
 };
 

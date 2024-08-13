@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
+
 const Middleware = require('./middleware/middleware');
 const Usuario = require('./controllers/usuario');
 const transacaoController = require('./controllers/transaçao');
 const Categoria = require('./controllers/categoria');
 const Subcategoria = require('./controllers/subcategoria');
+const Orcamento = require('./controllers/orçamento');
+const HistoricoOrcamento = require('./controllers/historico');
+const Relatorio = require('./controllers/relatorio');
+const RelatorioJson = require('./controllers/relatoriojson');
 
 router.post('/signup', Usuario.create);
 router.post('/login', Usuario.login);
@@ -28,9 +33,31 @@ router.get('/subcategoria/:id?', Subcategoria.readSubcategoria);
 router.put('/subcategoria/:id', Subcategoria.updateSubcategoria);
 router.delete('/subcategoria/:id', Subcategoria.deleteSubcategoria);
 
-// Rota para verificar se a API está respondendo
+router.post('/orcamento', Orcamento.createOrcamento);
+router.get('/orcamento/:id?', Orcamento.readOrcamento); 
+router.put('/orcamento/:id', Orcamento.updateOrcamento); 
+router.delete('/orcamento/:id', Orcamento.deleteOrcamento); 
+
+router.post('/historico-orcamento', HistoricoOrcamento.createHistoricoOrcamento);
+router.get('/historico-orcamento/:id?', HistoricoOrcamento.readHistoricoOrcamento); 
+router.put('/historico-orcamento/:id', HistoricoOrcamento.updateHistoricoOrcamento); 
+router.delete('/historico-orcamento/:id', HistoricoOrcamento.deleteHistoricoOrcamento); 
+
+router.post('/relatorio', Relatorio.createRelatorio);
+router.get('/relatorio/:id?', Relatorio.readRelatorio); 
+router.put('/relatorio/:id', Relatorio.updateRelatorio); 
+router.delete('/relatorio/:id', Relatorio.deleteRelatorio);
+
+router.post('/relatorio-json', RelatorioJson.createRelatorioJson);
+router.get('/relatorio-json/:id?', RelatorioJson.readRelatorioJson);
+router.put('/relatorio-json/:id', RelatorioJson.updateRelatorioJson);
+router.delete('/relatorio-json/:id', RelatorioJson.deleteRelatorioJson);
+
+
 router.get('/', (req, res) => { 
+
     return res.json("API respondendo"); 
+
 });
 
 module.exports = router;

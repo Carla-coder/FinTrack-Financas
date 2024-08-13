@@ -16,9 +16,9 @@ function AppTabs() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Transações" component={TransactionsScreen} />
-      <Tab.Screen name="Orçamentos" component={BudgetsScreen} />
-      <Tab.Screen name="Relatórios" component={ReportsScreen} />
+      <Tab.Screen name="Transactions" component={TransactionsScreen} />
+      <Tab.Screen name="Budgets" component={BudgetsScreen} />
+      <Tab.Screen name="Reports" component={ReportsScreen} />
     </Tab.Navigator>
   );
 }
@@ -26,13 +26,12 @@ function AppTabs() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Cadastro" component={RegisterScreen} /> 
+        <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="AppTabs" component={AppTabs} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -63,6 +63,14 @@ const LoginScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
+
+        {/* Botão para navegar para a tela de cadastro */}
+        <TouchableOpacity 
+          style={styles.registerButton} 
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={styles.registerButtonText}>Não tem uma conta? Cadastre-se</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -109,9 +117,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  registerButton: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  registerButtonText: {
+    color: "#007bff",
+    textDecorationLine: "underline",
+  },
 });
 
 export default LoginScreen;
-
 
 
