@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 export default function RegisterScreen({ navigation }) {
     const [email, setEmail] = useState('');
@@ -9,17 +10,22 @@ export default function RegisterScreen({ navigation }) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (password !== confirmPassword) {
             Alert.alert('Erro', 'As senhas não correspondem!');
             return;
         }
 
-        // Salvar o usuário no localStorage (AsyncStorage para React Native)
-        // AsyncStorage.setItem('userEmail', email);
-        // AsyncStorage.setItem('userPassword', password);
-        Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-        navigation.navigate('Login'); // Redireciona para a página de login após o cadastro
+        try {
+            // Salvar o usuário no AsyncStorage
+            await AsyncStorage.setItem('userEmail', email);
+            await AsyncStorage.setItem('userPassword', password);
+            Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+            navigation.navigate('Login'); // Redireciona para a página de login após o cadastro
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Erro', 'Ocorreu um erro ao cadastrar. Tente novamente.');
+        }
     };
 
     const togglePasswordVisibility = () => {

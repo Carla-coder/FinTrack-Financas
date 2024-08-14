@@ -7,26 +7,31 @@ import {
   Alert,
   StyleSheet,
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    const storedEmail = "user@example.com"; // Simular email armazenado no localStorage
-    const storedPassword = "password123"; // Simular senha armazenada no localStorage
+  const handleLogin = async () => {
+    try {
+      const storedEmail = await AsyncStorage.getItem("userEmail");
+      const storedPassword = await AsyncStorage.getItem("userPassword");
 
-    if (!storedEmail || !storedPassword) {
-      Alert.alert("Erro", "Você precisa se cadastrar primeiro!");
-      return;
-    }
+      if (!storedEmail || !storedPassword) {
+        Alert.alert("Erro", "Você precisa se cadastrar primeiro!");
+        return;
+      }
 
-    if (email === storedEmail && password === storedPassword) {
-      Alert.alert("Sucesso", "Login realizado com sucesso!");
-      // Navega para o Dashboard após o login bem-sucedido
-      navigation.navigate("Dashboard");
-    } else {
-      Alert.alert("Erro", "Email ou senha incorretos!");
+      if (email === storedEmail && password === storedPassword) {
+        Alert.alert("Sucesso", "Login realizado com sucesso!");
+        navigation.navigate("AppTabs"); // Navega para AppTabs após o login bem-sucedido
+      } else {
+        Alert.alert("Erro", "Email ou senha incorretos!");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Ocorreu um erro ao fazer login.");
     }
   };
 
@@ -58,6 +63,14 @@ const LoginScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
+
+        {/* Botão para navegar para a tela de cadastro */}
+        <TouchableOpacity 
+          style={styles.registerButton} 
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={styles.registerButtonText}>Não tem uma conta? Cadastre-se</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -76,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+    elevation: 5,
   },
   title: {
     marginBottom: 20,
@@ -104,6 +117,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  registerButton: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  registerButtonText: {
+    color: "#007bff",
+    textDecorationLine: "underline",
+  },
 });
 
 export default LoginScreen;
+
+

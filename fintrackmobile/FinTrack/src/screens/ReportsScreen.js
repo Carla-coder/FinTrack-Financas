@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 
-export default function Relatorios() {
+export default function ReportsScreen() {
   const data = {
     labels: ['Alimentação', 'Transporte', 'Entretenimento', 'Utilidades'],
     datasets: [
