@@ -25,6 +25,7 @@ async function loadTransactionData() {
         const transactions = await response.json();
         updateDashboard(transactions); // Atualize o dashboard com as transações carregadas
         displayTransactions(transactions); // Exiba as transações na tabela
+        updateCharts(transactions); // Atualize os gráficos com os dados carregados
     } catch (error) {
         console.error('Erro ao carregar transações:', error);
     }
@@ -60,11 +61,14 @@ function updateDashboard(transactions) {
     let expenses = 0;
 
     transactions.forEach(transaction => {
-        if (transaction.categoria === 'INCOME') {
+        if (transaction.categoria === 'RENDA') {
             balance += transaction.valor;
-        } else if (transaction.categoria === 'EXPENSE') {
+        } else if (transaction.categoria === 'ALIMENTACAO' ||
+                   transaction.categoria === 'TRANSPORTE' ||
+                   transaction.categoria === 'UTILIDADES' ||
+                   transaction.categoria === 'ENTRETENIMENTO') {
             balance -= transaction.valor;
-            expenses += Math.abs(transaction.valor); // Adiciona o valor absoluto dos gastos
+            expenses += transaction.valor; // Adiciona o valor dos gastos
         }
     });
 
@@ -84,5 +88,93 @@ function displayTransactions(transactions) {
             <td>R$ ${transaction.valor.toFixed(2)}</td>
         </tr>`;
         tbody.innerHTML += row;
+    });
+}
+
+// Função para atualizar os gráficos
+function updateCharts(transactions) {
+    const categories = {};
+    let income = 0;
+    let totalExpenses = 0;
+
+    // Organizar os dados para os gráficos
+    transactions.forEach(transaction => {
+        if (transaction.categoria === 'RENDA') {
+            income += transaction.valor;
+        } else {
+            if (!categories[transaction.categoria]) {
+                categories[transaction.categoria] = 0;
+            }
+            categories[transaction.categoria] += transaction.valor;
+            totalExpenses += transaction.valor;
+        }
+    });
+
+    // Atualizar gráfico de fluxo de caixa (linha)
+    const cashFlowChartContext = document.getElementById('cashFlowChart').getContext('2d');
+    new Chart(cashFlowChartContext, {
+        type: 'line',
+        data: {
+            labels: ['Renda', 'Gastos'],
+            datasets: [{
+                label: 'Fluxo de Caixa',
+                data: [income, -totalExpenses], // Use valores negativos para representar gastos
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.1 // Curva da linha
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Atualizar gráfico de categorias de despesas (pizza)
+    const expensePieChartContext = document.getElementById('expensePieChart').getContext('2d');
+    new Chart(expensePieChartContext, {
+        type: 'pie',
+        data: {
+            labels: ['Alimentação', 'Transporte', 'Utilidades', 'Entretenimento'],
+            datasets: [{
+                label: 'Despesas por Categoria',
+                data: [
+                    categories['ALIMENTACAO'] || 0,
+                    categories['TRANSPORTE'] || 0,
+                    categories['UTILIDADES'] || 0,
+                    categories['ENTRETENIMENTO'] || 0
+                ],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                borderColor: '#ffffff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            const label = tooltipItem.label || '';
+                            const value = tooltipItem.raw;
+                            return `${label}: R$ ${value.toFixed(2)}`;
+                        }
+                    }
+                }
+            }
+        }
     });
 }
