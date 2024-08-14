@@ -8,6 +8,7 @@
 //   TextInput,
 //   FlatList,
 //   Picker,
+//   ScrollView,
 // } from "react-native";
 // import { LineChart } from "react-native-chart-kit";
 
@@ -59,55 +60,57 @@
 
 //   return (
 //     <View style={styles.container}>
-//       <View style={styles.card}>
-//         <Text style={styles.title}>Saldo Atual</Text>
-//         <Text style={[styles.balance, { color: "green" }]}>R$ 5.234,56</Text>
-//       </View>
-//       <View style={styles.card}>
-//         <Text style={styles.title}>Gastos do Mês</Text>
-//         <Text style={[styles.balance, { color: "red" }]}>R$ 2.145,30</Text>
-//       </View>
+//       <ScrollView contentContainerStyle={styles.scrollView}>
+//         <View style={styles.card}>
+//           <Text style={styles.title}>Saldo Atual</Text>
+//           <Text style={[styles.balance, { color: "green" }]}>R$ 5.234,56</Text>
+//         </View>
+//         <View style={styles.card}>
+//           <Text style={styles.title}>Gastos do Mês</Text>
+//           <Text style={[styles.balance, { color: "red" }]}>R$ 2.145,30</Text>
+//         </View>
 
-//       <LineChart
-//         data={{
-//           labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
-//           datasets: [
-//             {
-//               data: [3000, 3200, 3100, 3500, 3300, 3700],
-//               color: () => `rgba(75, 192, 192, 1)`,
-//             },
-//             {
-//               data: [2500, 2700, 2600, 2800, 2900, 3000],
-//               color: () => `rgba(255, 99, 132, 1)`,
-//             },
-//           ],
-//         }}
-//         width={400}
-//         height={220}
-//         chartConfig={{
-//           backgroundColor: "#fff",
-//           backgroundGradientFrom: "#f4f4f4",
-//           backgroundGradientTo: "#f4f4f4",
-//           decimalPlaces: 2,
-//           color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-//         }}
-//         style={styles.chart}
-//       />
+//         <LineChart
+//           data={{
+//             labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
+//             datasets: [
+//               {
+//                 data: [3000, 3200, 3100, 3500, 3300, 3700],
+//                 color: () => `rgba(75, 192, 192, 1)`,
+//               },
+//               {
+//                 data: [2500, 2700, 2600, 2800, 2900, 3000],
+//                 color: () => `rgba(255, 99, 132, 1)`,
+//               },
+//             ],
+//           }}
+//           width={400}
+//           height={220}
+//           chartConfig={{
+//             backgroundColor: "#fff",
+//             backgroundGradientFrom: "#f4f4f4",
+//             backgroundGradientTo: "#f4f4f4",
+//             decimalPlaces: 2,
+//             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+//           }}
+//           style={styles.chart}
+//         />
 
-//       {/* Listar Transações */}
-//       <FlatList
-//         data={transactions}
-//         keyExtractor={(item) => item.id.toString()}
-//         renderItem={({ item }) => (
-//           <View style={styles.transactionItem}>
-//             <Text>{item.date}</Text>
-//             <Text>{item.description}</Text>
-//             <Text>{item.category}</Text>
-//             <Text>{item.amount.toFixed(2)}</Text>
-//           </View>
-//         )}
-//         contentContainerStyle={{ paddingBottom: 280 }}
-//       />
+//         {/* Listar Transações */}
+//         <FlatList
+//           data={transactions}
+//           keyExtractor={(item) => item.id.toString()}
+//           renderItem={({ item }) => (
+//             <View style={styles.transactionItem}>
+//               <Text>{item.date}</Text>
+//               <Text>{item.description}</Text>
+//               <Text>{item.category}</Text>
+//               <Text>{item.amount.toFixed(2)}</Text>
+//             </View>
+//           )}
+//           contentContainerStyle={{ paddingBottom: 80 }} // Aumentar paddingBottom para evitar sobreposição
+//         />
+//       </ScrollView>
 
 //       {/* Modal para adicionar transação */}
 //       <Modal
@@ -118,9 +121,6 @@
 //       >
 //         <View style={styles.modalContainer}>
 //           <View style={styles.modalContent}>
-
-         
-//             {/* Container para título e botão de fechar */}
 //             <View style={styles.modalHeader}>
 //               <Text style={styles.modalTitle}>Adicionar Nova Transação</Text>
 //               <TouchableOpacity
@@ -199,6 +199,11 @@
 // const styles = StyleSheet.create({
 //   container: {
 //     padding: 20,
+//     flex: 1,
+//   },
+//   scrollView: {
+//     flexGrow: 1,
+//     paddingBottom: 80, // Aumentar o paddingBottom para evitar sobreposição
 //   },
 //   card: {
 //     backgroundColor: "#fff",
@@ -237,10 +242,11 @@
 //   },
 //   modalContent: {
 //     backgroundColor: "#fff",
-//     padding: 20,
+//     padding: 30,
 //     borderRadius: 10,
+//     marginBottom: 80,
 //     width: "100%",
-//     masWidth: 400,
+//     maxWidth: 400,
 //     alignItems: "center",
 //     position: "relative",
 //   },
@@ -248,7 +254,7 @@
 //     flexDirection: "row",
 //     justifyContent: "center",
 //     alignItems: "center",
-//     width: "100%", 
+//     width: "100%",
 //     marginBottom: 20,
 //   },
 //   modalTitle: {
@@ -257,9 +263,9 @@
 //     marginBottom: 20,
 //   },
 //   closeButton: {
-//     position: "absolute", 
-//     right: 0, 
-//     top: 0, 
+//     position: "absolute",
+//     right: 0,
+//     top: 0,
 //     padding: 10,
 //   },
 //   closeButtonText: {
@@ -273,19 +279,19 @@
 //     borderColor: "#ccc",
 //     borderWidth: 1,
 //     borderRadius: 5,
-//     fontSize: 16, 
-//     height: 50, 
+//     fontSize: 16,
+//     height: 50,
 //     marginBottom: 20,
 //   },
 //   picker: {
 //     width: "90%",
-//     fontSize: 16, 
-//     height: 50, 
-//     borderColor: "#ccc", 
-//     borderWidth: 1, 
-//     borderRadius: 5, 
+//     fontSize: 16,
+//     height: 50,
+//     borderColor: "#ccc",
+//     borderWidth: 1,
+//     borderRadius: 5,
 //     justifyContent: "center",
-//     marginBottom: 20, 
+//     marginBottom: 20,
 //   },
 //   modalButtons: {
 //     flexDirection: "row",
@@ -306,8 +312,8 @@
 //   },
 //   roundButton: {
 //     position: "absolute",
-//     bottom: 20,
-//     right: 20,
+//     bottom: 80,
+//     right: 40, 
 //     width: 60,
 //     height: 60,
 //     borderRadius: 30,
@@ -322,8 +328,6 @@
 //     fontWeight: "bold",
 //   },
 // });
-
-
 import React, { useState } from "react";
 import {
   View,
@@ -344,16 +348,18 @@ export default function DashboardScreen() {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [category, setCategory] = useState("");
+  const [type, setType] = useState(""); // Novo estado para "Tipo"
   const [transactions, setTransactions] = useState([]);
 
   const handleAddTransaction = () => {
-    if (description && amount && date && category) {
+    if (description && amount && date && category && type) {
       const newTransaction = {
         id: transactions.length + 1,
         description,
         amount: parseFloat(amount),
         date,
         category,
+        type, // Adiciona o tipo à transação
       };
 
       setTransactions([...transactions, newTransaction]);
@@ -361,6 +367,7 @@ export default function DashboardScreen() {
       setAmount("");
       setDate("");
       setCategory("");
+      setType(""); // Reseta o campo "Tipo"
       setModalVisible(false);
     } else {
       alert("Por favor, preencha todos os campos.");
@@ -387,55 +394,66 @@ export default function DashboardScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Saldo Atual</Text>
-          <Text style={[styles.balance, { color: "green" }]}>R$ 5.234,56</Text>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.title}>Gastos do Mês</Text>
-          <Text style={[styles.balance, { color: "red" }]}>R$ 2.145,30</Text>
+        {/* Novo container para colocar "Saldo Atual" e "Gastos do Mês" na mesma linha */}
+        <View style={styles.rowContainer}>
+          <View style={styles.card}>
+            <Text style={styles.title}>Saldo Atual</Text>
+            <Text style={[styles.balance, { color: "green" }]}>R$ 5.234,56</Text>
+          </View>
+          <View style={styles.card}>
+            <Text style={styles.title}>Gastos do Mês</Text>
+            <Text style={[styles.balance, { color: "red" }]}>R$ 2.145,30</Text>
+          </View>
         </View>
 
-        <LineChart
-          data={{
-            labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
-            datasets: [
-              {
-                data: [3000, 3200, 3100, 3500, 3300, 3700],
-                color: () => `rgba(75, 192, 192, 1)`,
-              },
-              {
-                data: [2500, 2700, 2600, 2800, 2900, 3000],
-                color: () => `rgba(255, 99, 132, 1)`,
-              },
-            ],
-          }}
-          width={400}
-          height={220}
-          chartConfig={{
-            backgroundColor: "#fff",
-            backgroundGradientFrom: "#f4f4f4",
-            backgroundGradientTo: "#f4f4f4",
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          }}
-          style={styles.chart}
-        />
+        {/* Container para o gráfico */}
+        <View style={styles.chartContainer}>
+          <Text style={styles.containerTitle}>Fluxo de Caixa</Text>
+          <LineChart
+            data={{
+              labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
+              datasets: [
+                {
+                  data: [3000, 3200, 3100, 3500, 3300, 3700],
+                  color: () => `rgba(75, 192, 192, 1)`,
+                },
+                {
+                  data: [2500, 2700, 2600, 2800, 2900, 3000],
+                  color: () => `rgba(255, 99, 132, 1)`,
+                },
+              ],
+            }}
+            width={400}
+            height={220}
+            chartConfig={{
+              backgroundColor: "#fff",
+              backgroundGradientFrom: "#f4f4f4",
+              backgroundGradientTo: "#f4f4f4",
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            }}
+            style={styles.chart}
+          />
+        </View>
 
-        {/* Listar Transações */}
-        <FlatList
-          data={transactions}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.transactionItem}>
-              <Text>{item.date}</Text>
-              <Text>{item.description}</Text>
-              <Text>{item.category}</Text>
-              <Text>{item.amount.toFixed(2)}</Text>
-            </View>
-          )}
-          contentContainerStyle={{ paddingBottom: 80 }} // Aumentar paddingBottom para evitar sobreposição
-        />
+        {/* Container para a lista de transações */}
+        <View style={styles.transactionsContainer}>
+          <Text style={styles.containerTitle}>Novas Transações</Text>
+          <FlatList
+            data={transactions}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.transactionItem}>
+                <Text>{item.date}</Text>
+                <Text>{item.description}</Text>
+                <Text>{item.category}</Text>
+                <Text>{item.type}</Text> {/* Exibe o tipo */}
+                <Text>{item.amount.toFixed(2)}</Text>
+              </View>
+            )}
+            contentContainerStyle={{ paddingBottom: 80 }} // Aumentar paddingBottom para evitar sobreposição
+          />
+        </View>
       </ScrollView>
 
       {/* Modal para adicionar transação */}
@@ -471,13 +489,23 @@ export default function DashboardScreen() {
               onChangeText={setDescription}
             />
 
+            {/* Novo Picker para Tipo */}
+            <Picker
+              selectedValue={type}
+              style={styles.picker}
+              onValueChange={(itemValue) => setType(itemValue)}
+            >
+              <Picker.Item label="Selecione o tipo" value="" />
+              <Picker.Item label="Renda" value="renda" />
+              <Picker.Item label="Despesa" value="despesa" />
+            </Picker>
+
             <Picker
               selectedValue={category}
               style={styles.picker}
               onValueChange={(itemValue) => setCategory(itemValue)}
             >
               <Picker.Item label="Selecione uma categoria" value="" />
-              <Picker.Item label="Renda" value="renda" />
               <Picker.Item label="Alimentação" value="alimentacao" />
               <Picker.Item label="Transporte" value="transporte" />
               <Picker.Item label="Utilidades" value="utilidades" />
@@ -531,11 +559,17 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: 80, // Aumentar o paddingBottom para evitar sobreposição
   },
+  rowContainer: {
+    flexDirection: "row", // Coloca os cartões na mesma linha
+    justifyContent: "space-between", // Espaçamento entre os cartões
+    marginBottom: 20, // Margem inferior para o gráfico
+  },
   card: {
     backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
-    marginBottom: 20,
+    flex: 1, // Faz os cartões ocuparem espaço igual
+    marginHorizontal: 5, // Espaçamento horizontal entre os cartões
     elevation: 5,
   },
   title: {
@@ -547,39 +581,52 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 10,
   },
+  chartContainer: {
+    backgroundColor: "#fff", // Fundo branco para o container do gráfico
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20, // Margem inferior para a lista de transações
+    elevation: 5,
+  },
+  containerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
   chart: {
     marginVertical: 8,
     borderRadius: 16,
   },
+  transactionsContainer: {
+    backgroundColor: "#fff", // Fundo branco para o container das transações
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20, // Margem inferior para o conteúdo
+    elevation: 5,
+  },
   transactionItem: {
-    backgroundColor: "#f4f4f4",
-    padding: 10,
-    borderRadius: 5,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: 20,
   },
   modalContent: {
-    backgroundColor: "#fff",
-    padding: 30,
+    width: "90%",
+    backgroundColor: "white",
     borderRadius: 10,
-    marginBottom: 80,
-    width: "100%",
-    maxWidth: 400,
-    alignItems: "center",
-    position: "relative",
+    padding: 20,
+    elevation: 5,
   },
   modalHeader: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    position: "relative",
+    alignItems: "right",
     width: "100%",
     marginBottom: 20,
   },
@@ -639,7 +686,7 @@ const styles = StyleSheet.create({
   roundButton: {
     position: "absolute",
     bottom: 80,
-    right: 40, 
+    right: 40,
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -654,3 +701,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
