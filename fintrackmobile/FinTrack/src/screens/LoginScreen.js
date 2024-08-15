@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
+  Image
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -37,6 +38,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Image source={require('../assets/logomarca.png')} style={styles.logo} />
       <View style={styles.loginContainer}>
         <Text style={styles.title}>Login</Text>
         <View style={styles.formGroup}>
@@ -82,6 +84,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f4f4f4",
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
   },
   loginContainer: {
     width: "90%",

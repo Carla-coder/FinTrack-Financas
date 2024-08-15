@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
@@ -38,6 +38,7 @@ export default function RegisterScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
+             <Image source={require('../assets/logomarca.png')} style={styles.logo} />
             <Text style={styles.title}>Bem-vindo à Finance Manager</Text>
             <Text style={styles.welcomeMessage}>Crie sua conta para gerenciar suas finanças de forma fácil e eficiente!</Text>
             <View style={styles.formGroup}>
@@ -93,6 +94,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#f4f4f4',
         padding: 20,
+    },
+    logo: {
+        width: 100,
+        height: 100,
+        marginBottom: 20,
     },
     title: {
         fontSize: 24,
