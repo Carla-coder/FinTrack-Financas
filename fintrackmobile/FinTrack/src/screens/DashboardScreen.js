@@ -1,333 +1,3 @@
-// import React, { useState } from "react";
-// import {
-//   View,
-//   Text,
-//   StyleSheet,
-//   Modal,
-//   TouchableOpacity,
-//   TextInput,
-//   FlatList,
-//   Picker,
-//   ScrollView,
-// } from "react-native";
-// import { LineChart } from "react-native-chart-kit";
-
-// export default function DashboardScreen() {
-//   const [modalVisible, setModalVisible] = useState(false);
-//   const [description, setDescription] = useState("");
-//   const [amount, setAmount] = useState("");
-//   const [date, setDate] = useState("");
-//   const [category, setCategory] = useState("");
-//   const [transactions, setTransactions] = useState([]);
-
-//   const handleAddTransaction = () => {
-//     if (description && amount && date && category) {
-//       const newTransaction = {
-//         id: transactions.length + 1,
-//         description,
-//         amount: parseFloat(amount),
-//         date,
-//         category,
-//       };
-
-//       setTransactions([...transactions, newTransaction]);
-//       setDescription("");
-//       setAmount("");
-//       setDate("");
-//       setCategory("");
-//       setModalVisible(false);
-//     } else {
-//       alert("Por favor, preencha todos os campos.");
-//     }
-//   };
-
-//   const formatDate = (text) => {
-//     const numbers = text.replace(/\D/g, "");
-//     let formattedDate = "";
-
-//     if (numbers.length > 0) {
-//       formattedDate += numbers.slice(0, 2); // Dia
-//     }
-//     if (numbers.length >= 3) {
-//       formattedDate += "/" + numbers.slice(2, 4); // Mês
-//     }
-//     if (numbers.length >= 5) {
-//       formattedDate += "/" + numbers.slice(4, 8); // Ano
-//     }
-
-//     setDate(formattedDate);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <ScrollView contentContainerStyle={styles.scrollView}>
-//         <View style={styles.card}>
-//           <Text style={styles.title}>Saldo Atual</Text>
-//           <Text style={[styles.balance, { color: "green" }]}>R$ 5.234,56</Text>
-//         </View>
-//         <View style={styles.card}>
-//           <Text style={styles.title}>Gastos do Mês</Text>
-//           <Text style={[styles.balance, { color: "red" }]}>R$ 2.145,30</Text>
-//         </View>
-
-//         <LineChart
-//           data={{
-//             labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
-//             datasets: [
-//               {
-//                 data: [3000, 3200, 3100, 3500, 3300, 3700],
-//                 color: () => `rgba(75, 192, 192, 1)`,
-//               },
-//               {
-//                 data: [2500, 2700, 2600, 2800, 2900, 3000],
-//                 color: () => `rgba(255, 99, 132, 1)`,
-//               },
-//             ],
-//           }}
-//           width={400}
-//           height={220}
-//           chartConfig={{
-//             backgroundColor: "#fff",
-//             backgroundGradientFrom: "#f4f4f4",
-//             backgroundGradientTo: "#f4f4f4",
-//             decimalPlaces: 2,
-//             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-//           }}
-//           style={styles.chart}
-//         />
-
-//         {/* Listar Transações */}
-//         <FlatList
-//           data={transactions}
-//           keyExtractor={(item) => item.id.toString()}
-//           renderItem={({ item }) => (
-//             <View style={styles.transactionItem}>
-//               <Text>{item.date}</Text>
-//               <Text>{item.description}</Text>
-//               <Text>{item.category}</Text>
-//               <Text>{item.amount.toFixed(2)}</Text>
-//             </View>
-//           )}
-//           contentContainerStyle={{ paddingBottom: 80 }} // Aumentar paddingBottom para evitar sobreposição
-//         />
-//       </ScrollView>
-
-//       {/* Modal para adicionar transação */}
-//       <Modal
-//         animationType="slide"
-//         transparent={true}
-//         visible={modalVisible}
-//         onRequestClose={() => setModalVisible(false)}
-//       >
-//         <View style={styles.modalContainer}>
-//           <View style={styles.modalContent}>
-//             <View style={styles.modalHeader}>
-//               <Text style={styles.modalTitle}>Adicionar Nova Transação</Text>
-//               <TouchableOpacity
-//                 style={styles.closeButton}
-//                 onPress={() => setModalVisible(false)}
-//               >
-//                 <Text style={styles.closeButtonText}>X</Text>
-//               </TouchableOpacity>
-//             </View>
-
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Data (DD/MM/AAAA)"
-//               value={date}
-//               onChangeText={formatDate}
-//             />
-
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Descrição"
-//               value={description}
-//               onChangeText={setDescription}
-//             />
-
-//             <Picker
-//               selectedValue={category}
-//               style={styles.picker}
-//               onValueChange={(itemValue) => setCategory(itemValue)}
-//             >
-//               <Picker.Item label="Selecione uma categoria" value="" />
-//               <Picker.Item label="Renda" value="renda" />
-//               <Picker.Item label="Alimentação" value="alimentacao" />
-//               <Picker.Item label="Transporte" value="transporte" />
-//               <Picker.Item label="Utilidades" value="utilidades" />
-//               <Picker.Item label="Entretenimento" value="entretenimento" />
-//             </Picker>
-
-//             {/* Input para valor */}
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Valor"
-//               value={amount}
-//               onChangeText={setAmount}
-//               keyboardType="numeric"
-//             />
-
-//             <View style={styles.modalButtons}>
-//               <TouchableOpacity
-//                 style={styles.modalButton}
-//                 onPress={handleAddTransaction}
-//               >
-//                 <Text style={styles.modalButtonText}>Salvar</Text>
-//               </TouchableOpacity>
-//               <TouchableOpacity
-//                 style={styles.modalButton}
-//                 onPress={() => setModalVisible(false)}
-//               >
-//                 <Text style={styles.modalButtonText}>Cancelar</Text>
-//               </TouchableOpacity>
-//             </View>
-//           </View>
-//         </View>
-//       </Modal>
-
-//       {/* Botão redondo para abrir o modal */}
-//       <TouchableOpacity
-//         style={styles.roundButton}
-//         onPress={() => setModalVisible(true)}
-//       >
-//         <Text style={styles.roundButtonText}>+</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     padding: 20,
-//     flex: 1,
-//   },
-//   scrollView: {
-//     flexGrow: 1,
-//     paddingBottom: 80, // Aumentar o paddingBottom para evitar sobreposição
-//   },
-//   card: {
-//     backgroundColor: "#fff",
-//     padding: 15,
-//     borderRadius: 10,
-//     marginBottom: 20,
-//     elevation: 5,
-//   },
-//   title: {
-//     fontSize: 18,
-//     fontWeight: "bold",
-//   },
-//   balance: {
-//     fontSize: 24,
-//     fontWeight: "bold",
-//     marginTop: 10,
-//   },
-//   chart: {
-//     marginVertical: 8,
-//     borderRadius: 16,
-//   },
-//   transactionItem: {
-//     backgroundColor: "#f4f4f4",
-//     padding: 10,
-//     borderRadius: 5,
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     marginBottom: 10,
-//   },
-//   modalContainer: {
-//     flex: 1,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     backgroundColor: "rgba(0, 0, 0, 0.5)",
-//     padding: 20,
-//   },
-//   modalContent: {
-//     backgroundColor: "#fff",
-//     padding: 30,
-//     borderRadius: 10,
-//     marginBottom: 80,
-//     width: "100%",
-//     maxWidth: 400,
-//     alignItems: "center",
-//     position: "relative",
-//   },
-//   modalHeader: {
-//     flexDirection: "row",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     width: "100%",
-//     marginBottom: 20,
-//   },
-//   modalTitle: {
-//     fontSize: 20,
-//     fontWeight: "bold",
-//     marginBottom: 20,
-//   },
-//   closeButton: {
-//     position: "absolute",
-//     right: 0,
-//     top: 0,
-//     padding: 10,
-//   },
-//   closeButtonText: {
-//     fontSize: 18,
-//     fontWeight: "bold",
-//     color: "#007bff",
-//   },
-//   input: {
-//     width: "90%",
-//     padding: 10,
-//     borderColor: "#ccc",
-//     borderWidth: 1,
-//     borderRadius: 5,
-//     fontSize: 16,
-//     height: 50,
-//     marginBottom: 20,
-//   },
-//   picker: {
-//     width: "90%",
-//     fontSize: 16,
-//     height: 50,
-//     borderColor: "#ccc",
-//     borderWidth: 1,
-//     borderRadius: 5,
-//     justifyContent: "center",
-//     marginBottom: 20,
-//   },
-//   modalButtons: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     width: "90%",
-//   },
-//   modalButton: {
-//     flex: 1,
-//     padding: 10,
-//     borderRadius: 5,
-//     alignItems: "center",
-//     backgroundColor: "#007bff",
-//     marginHorizontal: 5,
-//   },
-//   modalButtonText: {
-//     color: "#fff",
-//     fontWeight: "bold",
-//   },
-//   roundButton: {
-//     position: "absolute",
-//     bottom: 80,
-//     right: 40, 
-//     width: 60,
-//     height: 60,
-//     borderRadius: 30,
-//     backgroundColor: "#007bff",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     elevation: 5,
-//   },
-//   roundButtonText: {
-//     color: "#fff",
-//     fontSize: 24,
-//     fontWeight: "bold",
-//   },
-// });
 import React, { useState } from "react";
 import {
   View,
@@ -340,7 +10,7 @@ import {
   Picker,
   ScrollView,
 } from "react-native";
-import { LineChart } from "react-native-chart-kit";
+import { LineChart, PieChart } from "react-native-chart-kit";
 
 export default function DashboardScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -351,6 +21,26 @@ export default function DashboardScreen() {
   const [type, setType] = useState(""); // Novo estado para "Tipo"
   const [transactions, setTransactions] = useState([]);
 
+  // Função para calcular o saldo e os gastos
+  const calculateBalanceAndExpenses = () => {
+    let balance = 0;
+    let expenses = 0;
+
+    transactions.forEach((transaction) => {
+      if (transaction.type === "renda") {
+        balance += transaction.amount;
+      } else if (transaction.type === "despesa") {
+        expenses += transaction.amount;
+      }
+    });
+
+    balance -= expenses; // Subtrai as despesas da renda para calcular o saldo
+
+    return { balance, expenses };
+  };
+
+  const { balance, expenses } = calculateBalanceAndExpenses();
+
   const handleAddTransaction = () => {
     if (description && amount && date && category && type) {
       const newTransaction = {
@@ -359,7 +49,7 @@ export default function DashboardScreen() {
         amount: parseFloat(amount),
         date,
         category,
-        type, // Adiciona o tipo à transação
+        type,
       };
 
       setTransactions([...transactions, newTransaction]);
@@ -367,7 +57,7 @@ export default function DashboardScreen() {
       setAmount("");
       setDate("");
       setCategory("");
-      setType(""); // Reseta o campo "Tipo"
+      setType("");
       setModalVisible(false);
     } else {
       alert("Por favor, preencha todos os campos.");
@@ -391,38 +81,88 @@ export default function DashboardScreen() {
     setDate(formattedDate);
   };
 
+  // Função para preparar os dados para o gráfico de fluxo de caixa
+  const prepareLineChartData = () => {
+    const labels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    let incomeData = new Array(12).fill(0); 
+    let expenseData = new Array(12).fill(0); 
+
+    transactions.forEach((transaction) => {
+        const dateParts = transaction.date.split("/");
+        const monthIndex = parseInt(dateParts[1], 10) - 1; 
+        if (transaction.type === "renda") {
+            incomeData[monthIndex] += transaction.amount;
+        } else if (transaction.type === "despesa") {
+            expenseData[monthIndex] += transaction.amount;
+        }
+    });
+
+    return {
+        labels,
+        datasets: [
+            {
+                data: incomeData.map((value) => (isNaN(value) ? 0 : value)),
+                color: () => `rgba(75, 192, 192, 1)`,
+                label: "Renda",
+            },
+            {
+                data: expenseData.map((value) => (isNaN(value) ? 0 : value)),
+                color: () => `rgba(255, 99, 132, 1)`,
+                label: "Despesas",
+            },
+        ],
+    };
+  };
+
+  // Função para preparar os dados para o gráfico de pizza
+  const preparePieChartData = () => {
+    let categoryTotals = {};
+
+    transactions.forEach((transaction) => {
+      if (transaction.type === "despesa") {
+        if (!categoryTotals[transaction.category]) {
+          categoryTotals[transaction.category] = 0;
+        }
+        categoryTotals[transaction.category] += transaction.amount;
+      }
+    });
+
+    return Object.keys(categoryTotals).map((category) => ({
+      name: category,
+      amount: categoryTotals[category],
+      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Gera uma cor aleatória
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 15,
+    }));
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        {/* Novo container para colocar "Saldo Atual" e "Gastos do Mês" na mesma linha */}
-        <View style={styles.rowContainer}>
+        <View style={styles.balanceContainer}>
           <View style={styles.card}>
             <Text style={styles.title}>Saldo Atual</Text>
-            <Text style={[styles.balance, { color: "green" }]}>R$ 5.234,56</Text>
+            <Text
+              style={[
+                styles.balance,
+                { color: balance >= 0 ? "green" : "red" } // Muda a cor dependendo do saldo
+              ]}
+            >
+              R$ {balance.toFixed(2)}
+            </Text>
           </View>
           <View style={styles.card}>
             <Text style={styles.title}>Gastos do Mês</Text>
-            <Text style={[styles.balance, { color: "red" }]}>R$ 2.145,30</Text>
+            <Text style={[styles.balance, { color: "red" }]}>
+              R$ {expenses.toFixed(2)}
+            </Text>
           </View>
         </View>
 
-        {/* Container para o gráfico */}
         <View style={styles.chartContainer}>
-          <Text style={styles.containerTitle}>Fluxo de Caixa</Text>
+          <Text style={styles.chartTitle}>Fluxo de caixa</Text>
           <LineChart
-            data={{
-              labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
-              datasets: [
-                {
-                  data: [3000, 3200, 3100, 3500, 3300, 3700],
-                  color: () => `rgba(75, 192, 192, 1)`,
-                },
-                {
-                  data: [2500, 2700, 2600, 2800, 2900, 3000],
-                  color: () => `rgba(255, 99, 132, 1)`,
-                },
-              ],
-            }}
+            data={prepareLineChartData()}
             width={400}
             height={220}
             chartConfig={{
@@ -436,9 +176,28 @@ export default function DashboardScreen() {
           />
         </View>
 
-        {/* Container para a lista de transações */}
+        <View style={styles.chartContainer}>
+          <Text style={styles.chartTitle}>Categoria de Gastos</Text>
+          <PieChart
+            data={preparePieChartData()}
+            width={400}
+            height={220}
+            chartConfig={{
+              backgroundColor: "#fff",
+              backgroundGradientFrom: "#f4f4f4",
+              backgroundGradientTo: "#f4f4f4",
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            }}
+            accessor="amount"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            style={styles.chart}
+          />
+        </View>
+
         <View style={styles.transactionsContainer}>
-          <Text style={styles.containerTitle}>Novas Transações</Text>
+          <Text style={styles.transactionsTitle}>Novas Transações</Text>
           <FlatList
             data={transactions}
             keyExtractor={(item) => item.id.toString()}
@@ -451,12 +210,11 @@ export default function DashboardScreen() {
                 <Text>{item.amount.toFixed(2)}</Text>
               </View>
             )}
-            contentContainerStyle={{ paddingBottom: 80 }} // Aumentar paddingBottom para evitar sobreposição
+            contentContainerStyle={{ paddingBottom: 80 }}
           />
         </View>
       </ScrollView>
 
-      {/* Modal para adicionar transação */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -489,7 +247,6 @@ export default function DashboardScreen() {
               onChangeText={setDescription}
             />
 
-            {/* Novo Picker para Tipo */}
             <Picker
               selectedValue={type}
               style={styles.picker}
@@ -512,7 +269,6 @@ export default function DashboardScreen() {
               <Picker.Item label="Entretenimento" value="entretenimento" />
             </Picker>
 
-            {/* Input para valor */}
             <TextInput
               style={styles.input}
               placeholder="Valor"
@@ -539,7 +295,6 @@ export default function DashboardScreen() {
         </View>
       </Modal>
 
-      {/* Botão redondo para abrir o modal */}
       <TouchableOpacity
         style={styles.roundButton}
         onPress={() => setModalVisible(true)}
@@ -557,59 +312,65 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
-    paddingBottom: 80, // Aumentar o paddingBottom para evitar sobreposição
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
-  rowContainer: {
-    flexDirection: "row", // Coloca os cartões na mesma linha
-    justifyContent: "space-between", // Espaçamento entre os cartões
-    marginBottom: 20, // Margem inferior para o gráfico
+  balanceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
   card: {
     backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    flex: 1, // Faz os cartões ocuparem espaço igual
-    marginHorizontal: 5, // Espaçamento horizontal entre os cartões
-    elevation: 5,
+    padding: 10,
+    borderRadius: 5,
+    width: "48%",
+    elevation: 2,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    marginBottom: 5,
   },
   balance: {
     fontSize: 24,
     fontWeight: "bold",
-    marginTop: 10,
   },
   chartContainer: {
-    backgroundColor: "#fff", // Fundo branco para o container do gráfico
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 20, // Margem inferior para a lista de transações
-    elevation: 5,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 20,
+    width: "100%",
   },
-  containerTitle: {
-    fontSize: 20,
+  chartTitle: {
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "center",
   },
   chart: {
     marginVertical: 8,
-    borderRadius: 16,
+    borderRadius: 8,
   },
   transactionsContainer: {
-    backgroundColor: "#fff", // Fundo branco para o container das transações
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 20, // Margem inferior para o conteúdo
-    elevation: 5,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 10,
+    width: "100%",
+  },
+  transactionsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
   },
   transactionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
   },
   modalContainer: {
     flex: 1,
@@ -618,87 +379,72 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: "90%",
-    backgroundColor: "white",
-    borderRadius: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
     padding: 20,
-    elevation: 5,
+    width: "80%",
   },
   modalHeader: {
-    position: "relative",
-    alignItems: "right",
-    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 20,
   },
   closeButton: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    padding: 10,
+    backgroundColor: "blue",
+    padding: 5,
+    borderRadius: 5,
   },
   closeButtonText: {
-    fontSize: 18,
+    color: "#fff",
     fontWeight: "bold",
-    color: "#007bff",
   },
   input: {
-    width: "90%",
-    padding: 10,
-    borderColor: "#ccc",
     borderWidth: 1,
+    borderColor: "#ddd",
     borderRadius: 5,
-    fontSize: 16,
-    height: 50,
-    marginBottom: 20,
+    padding: 10,
+    marginBottom: 10,
   },
   picker: {
-    width: "90%",
-    fontSize: 16,
-    height: 50,
-    borderColor: "#ccc",
     borderWidth: 1,
+    borderColor: "#ddd",
     borderRadius: 5,
-    justifyContent: "center",
-    marginBottom: 20,
+    padding: 10,
+    marginBottom: 10,
   },
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "90%",
   },
   modalButton: {
-    flex: 1,
+    backgroundColor: "#28a745",
     padding: 10,
     borderRadius: 5,
-    alignItems: "center",
-    backgroundColor: "#007bff",
-    marginHorizontal: 5,
+    width: "48%",
   },
   modalButtonText: {
     color: "#fff",
     fontWeight: "bold",
+    textAlign: "center",
   },
   roundButton: {
-    position: "absolute",
-    bottom: 80,
-    right: 40,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
     backgroundColor: "#007bff",
-    alignItems: "center",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: "center",
-    elevation: 5,
+    alignItems: "center",
+    position: "absolute",
+    bottom: 20,
+    right: 20,
   },
   roundButtonText: {
     color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 30,
   },
 });
-
