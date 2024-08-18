@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
+import React from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { BarChart } from "react-native-chart-kit";
 
 export default function ReportsScreen() {
   const data = {
-    labels: ['Alimentação', 'Transporte', 'Entretenimento', 'Utilidades'],
+    labels: ["Alimentação", "Transporte", "Entretenimento", "Utilidades"],
     datasets: [
       {
         data: [1000, 500, 300, 500],
@@ -22,11 +22,11 @@ export default function ReportsScreen() {
           data={data}
           width={300}
           height={220}
-          yAxisLabel={'R$'}
+          yAxisLabel={"R$"}
           chartConfig={{
-            backgroundColor: '#f4f4f4',
-            backgroundGradientFrom: '#f4f4f4',
-            backgroundGradientTo: '#f4f4f4',
+            backgroundColor: "#f4f4f4",
+            backgroundGradientFrom: "#f4f4f4",
+            backgroundGradientTo: "#f4f4f4",
             decimalPlaces: 2,
             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             style: {
@@ -51,26 +51,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f4f4f4',
+    backgroundColor: "#f4f4f4",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   card: {
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
 });

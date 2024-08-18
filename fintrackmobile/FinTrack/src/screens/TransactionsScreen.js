@@ -1,10 +1,25 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 
 const transactions = [
-  { date: '10/06/2023', description: 'Supermercado', category: 'Alimentação', amount: '-R$ 250,00' },
-  { date: '08/06/2023', description: 'Salário', category: 'Renda', amount: '+R$ 3.500,00' },
-  { date: '05/06/2023', description: 'Conta de Luz', category: 'Utilidades', amount: '-R$ 120,00' },
+  {
+    date: "10/06/2023",
+    description: "Supermercado",
+    category: "Alimentação",
+    amount: "-R$ 250,00",
+  },
+  {
+    date: "08/06/2023",
+    description: "Salário",
+    category: "Renda",
+    amount: "+R$ 3.500,00",
+  },
+  {
+    date: "05/06/2023",
+    description: "Conta de Luz",
+    category: "Utilidades",
+    amount: "-R$ 120,00",
+  },
 ];
 
 export default function TransactionsScreen() {
@@ -18,7 +33,12 @@ export default function TransactionsScreen() {
             <Text>{item.date}</Text>
             <Text>{item.description}</Text>
             <Text>{item.category}</Text>
-            <Text style={[styles.amount, item.amount.startsWith('+') ? styles.income : styles.expense]}>
+            <Text
+              style={[
+                styles.amount,
+                item.amount.startsWith("+") ? styles.income : styles.expense,
+              ]}
+            >
               {item.amount}
             </Text>
           </View>
@@ -33,11 +53,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   transaction: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 15,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginBottom: 10,
     elevation: 2,
   },
@@ -45,9 +65,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   income: {
-    color: 'green',
+    color: "green",
   },
   expense: {
-    color: 'red',
+    color: "red",
   },
 });
