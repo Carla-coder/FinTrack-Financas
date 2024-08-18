@@ -2,19 +2,18 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const createTransacao = async (req, res) => {
+    const { usuarioId, data, descricao, categoria, valor, tags } = req.body;
+
+    if (!usuarioId || !data || !descricao || !categoria || !valor) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    }
+
     try {
-        const { usuarioId, data, descricao, categoria, valor, tags } = req.body;
-
-        // Validar categoria
-        const validCategorias = ['RENDA', 'ALIMENTACAO', 'TRANSPORTE', 'UTILIDADES', 'ENTRETENIMENTO'];
-        if (!validCategorias.includes(categoria)) {
-            return res.status(400).json({ message: 'Categoria inválida.' });
-        }
-
-        // Criar transação
         const transacao = await prisma.transacao.create({
             data: {
-                usuarioId,
+                usuario: {
+                    connect: { id: usuarioId } // Conectar a transação com o usuário pelo ID
+                },
                 data: new Date(data),
                 descricao,
                 categoria,
@@ -22,11 +21,10 @@ const createTransacao = async (req, res) => {
                 tags
             }
         });
-
         res.status(201).json(transacao);
     } catch (error) {
         console.error('Erro ao criar transação:', error);
-        res.status(500).json({ message: 'Erro ao criar transação.' });
+        res.status(500).json({ error: 'Erro ao criar transação.' });
     }
 };
 

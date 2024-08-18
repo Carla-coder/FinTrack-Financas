@@ -6,14 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Função para decodificar o token e obter o usuarioId
-    const getUsuarioIdFromToken = (token) => {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id;
-    };
-
-    const usuarioId = getUsuarioIdFromToken(token);
-
     // Função para carregar o dashboard e as transações
     const loadDashboardData = async () => {
         try {
@@ -188,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    usuarioId, // Incluir o usuarioId
                     data: transactionDate,
                     descricao: transactionDescription,
                     categoria: transactionCategory,

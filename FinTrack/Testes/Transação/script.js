@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (!response.ok) throw new Error('Erro ao carregar transações.');
+            if (!response.ok) throw new Error(`Erro ao carregar transações: ${response.statusText}`);
 
             const transactions = await response.json();
             const transactionTableBody = document.getElementById('transactionTableBody');
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         });
 
-                        if (!response.ok) throw new Error('Erro ao carregar transação para edição.');
+                        if (!response.ok) throw new Error(`Erro ao carregar transação para edição: ${response.statusText}`);
 
                         const transaction = await response.json();
                         document.getElementById('editTransactionId').value = transaction.id;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         new bootstrap.Modal(document.getElementById('editTransactionModal')).show();
                     } catch (error) {
-                        console.error('Erro ao carregar dados da transação:', error);
+                        console.error(error);
                         alert(`Erro ao carregar dados da transação: ${error.message}`);
                     }
                 });
@@ -78,18 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                             });
 
-                            if (!response.ok) throw new Error('Erro ao excluir transação.');
+                            if (!response.ok) throw new Error(`Erro ao excluir transação: ${response.statusText}`);
 
                             loadTransactions(); // Recarregar transações
                         } catch (error) {
-                            console.error('Erro ao excluir transação:', error);
+                            console.error(error);
                             alert(`Erro ao excluir transação: ${error.message}`);
                         }
                     }
                 });
             });
         } catch (error) {
-            console.error('Erro ao carregar transações:', error);
+            console.error(error);
             alert(`Erro ao carregar transações: ${error.message}`);
         }
     };
@@ -106,11 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
             valor: parseFloat(formData.get('transactionAmount'))
         };
 
-        if (!transaction.data || !transaction.descricao || !transaction.categoria || isNaN(transaction.valor)) {
-            alert('Preencha todos os campos corretamente.');
-            return;
-        }
-
         try {
             const response = await fetch('http://localhost:3000/api/transacao', {
                 method: 'POST',
@@ -121,13 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(transaction)
             });
 
-            if (!response.ok) throw new Error('Erro ao adicionar transação.');
+            if (!response.ok) throw new Error(`Erro ao adicionar transação: ${response.statusText}`);
 
             form.reset(); // Limpar formulário
             new bootstrap.Modal(document.getElementById('addTransactionModal')).hide();
             loadTransactions(); // Recarregar transações
         } catch (error) {
-            console.error('Erro ao adicionar transação:', error);
+            console.error(error);
             alert(`Erro ao adicionar transação: ${error.message}`);
         }
     });
@@ -142,11 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
             valor: parseFloat(document.getElementById('editTransactionAmount').value)
         };
 
-        if (!transaction.data || !transaction.descricao || !transaction.categoria || isNaN(transaction.valor)) {
-            alert('Preencha todos os campos corretamente.');
-            return;
-        }
-
         try {
             const response = await fetch(`http://localhost:3000/api/transacao/${id}`, {
                 method: 'PATCH', // Usando PATCH para atualizações parciais
@@ -157,12 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(transaction)
             });
 
-            if (!response.ok) throw new Error('Erro ao atualizar transação.');
+            if (!response.ok) throw new Error(`Erro ao atualizar transação: ${response.statusText}`);
 
             new bootstrap.Modal(document.getElementById('editTransactionModal')).hide();
             loadTransactions(); // Recarregar transações
         } catch (error) {
-            console.error('Erro ao atualizar transação:', error);
+            console.error(error);
             alert(`Erro ao atualizar transação: ${error.message}`);
         }
     });
