@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
+  Image,
 } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -37,6 +38,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Image source={require("../assets/logomarca.png")} style={styles.logo} />
       <View style={styles.loginContainer}>
         <Text style={styles.title}>Login</Text>
         <View style={styles.formGroup}>
@@ -65,11 +67,13 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Botão para navegar para a tela de cadastro */}
-        <TouchableOpacity 
-          style={styles.registerButton} 
-          onPress={() => navigation.navigate('Register')}
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={() => navigation.navigate("Register")}
         >
-          <Text style={styles.registerButtonText}>Não tem uma conta? Cadastre-se</Text>
+          <Text style={styles.registerButtonText}>
+            Não tem uma conta? Cadastre-se
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -82,6 +86,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f4f4f4",
+  },
+  logo: {
+    width: 250,
+    height: 250,
+    marginBottom: 20,
   },
   loginContainer: {
     width: "90%",
@@ -108,7 +117,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   button: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#8ccaef",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
@@ -122,11 +131,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   registerButtonText: {
-    color: "#007bff",
+    color: "#474fa2",
     textDecorationLine: "underline",
   },
 });
 
 export default LoginScreen;
-
-

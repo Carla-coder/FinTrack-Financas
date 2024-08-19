@@ -1,4 +1,5 @@
 body {
+<<<<<<< HEAD
   font-family: "Arial", sans-serif;
   background-color: #f4f4f4;
 }
@@ -29,3 +30,23 @@ body {
 #loading {
   display: none;
 }
+=======
+    font-family: "Arial", sans-serif;
+    background-color: #f4f4f4;
+  }
+  .app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .card {
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .btn-add {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+>>>>>>> 6dba269aedc05506d818ab13d97dc5634de30b8c
