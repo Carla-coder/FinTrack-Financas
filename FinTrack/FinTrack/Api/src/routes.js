@@ -18,40 +18,40 @@ router.get('/usuarios/:id', Middleware.validaAcesso, Usuario.read);
 router.put('/usuarios/:id', Middleware.validaAcesso, Usuario.update);
 router.delete('/usuarios/:id', Middleware.validaAcesso, Usuario.del);
 
-router.post('/transacao', transacaoController.createTransacao);
-router.get('/transacao/:id?', transacaoController.readTransacao);
-router.put('/transacao/:id', transacaoController.updateTransacao);
-router.delete('/transacao/:id', transacaoController.deleteTransacao);
+router.post('/transacao',Middleware.validaAcesso, transacaoController.createTransacao);
+router.get('/transacao/:id?',Middleware.validaAcesso, transacaoController.readTransacao);
+router.put('/transacao/:id', Middleware.validaAcesso, transacaoController.updateTransacao);
+router.delete('/transacao/:id',Middleware.validaAcesso, transacaoController.deleteTransacao);
 
-router.post('/categoria', Categoria.createCategoria);
-router.get('/categoria/:id?', Categoria.readCategoria);
-router.put('/categoria/:id', Categoria.updateCategoria);
-router.delete('/categoria/:id', Categoria.deleteCategoria);
+router.post('/categoria',Middleware.validaAcesso, Categoria.createCategoria);
+router.get('/categoria/:id?',Middleware.validaAcesso, Categoria.readCategoria);
+router.put('/categoria/:id',Middleware.validaAcesso, Categoria.updateCategoria);
+router.delete('/categoria/:id',Middleware.validaAcesso, Categoria.deleteCategoria);
 
-router.post('/subcategoria', Subcategoria.createSubcategoria);
-router.get('/subcategoria/:id?', Subcategoria.readSubcategoria);
-router.put('/subcategoria/:id', Subcategoria.updateSubcategoria);
-router.delete('/subcategoria/:id', Subcategoria.deleteSubcategoria);
+router.post('/subcategoria',Middleware.validaAcesso, Subcategoria.createSubcategoria);
+router.get('/subcategoria/:id?',Middleware.validaAcesso, Subcategoria.readSubcategoria);
+router.put('/subcategoria/:id',Middleware.validaAcesso, Subcategoria.updateSubcategoria);
+router.delete('/subcategoria/:id',Middleware.validaAcesso, Subcategoria.deleteSubcategoria);
 
-router.post('/orcamento', Orcamento.createOrcamento);
-router.get('/orcamento/:id?', Orcamento.readOrcamento); 
-router.put('/orcamento/:id', Orcamento.updateOrcamento); 
-router.delete('/orcamento/:id', Orcamento.deleteOrcamento); 
+router.post('/orcamento',Middleware.validaAcesso, Orcamento.createOrcamento);
+router.get('/orcamento/:id?',Middleware.validaAcesso, Orcamento.readOrcamento); 
+router.put('/orcamento/:id',Middleware.validaAcesso, Orcamento.updateOrcamento); 
+router.delete('/orcamento/:id',Middleware.validaAcesso, Orcamento.deleteOrcamento); 
 
-router.post('/historico-orcamento', HistoricoOrcamento.createHistoricoOrcamento);
-router.get('/historico-orcamento/:id?', HistoricoOrcamento.readHistoricoOrcamento); 
-router.put('/historico-orcamento/:id', HistoricoOrcamento.updateHistoricoOrcamento); 
-router.delete('/historico-orcamento/:id', HistoricoOrcamento.deleteHistoricoOrcamento); 
+router.post('/historico-orcamento',Middleware.validaAcesso, HistoricoOrcamento.createHistoricoOrcamento);
+router.get('/historico-orcamento/:id?',Middleware.validaAcesso, HistoricoOrcamento.readHistoricoOrcamento); 
+router.put('/historico-orcamento/:id',Middleware.validaAcesso, HistoricoOrcamento.updateHistoricoOrcamento); 
+router.delete('/historico-orcamento/:id',Middleware.validaAcesso, HistoricoOrcamento.deleteHistoricoOrcamento); 
 
-router.post('/relatorio', Relatorio.createRelatorio);
-router.get('/relatorio/:id?', Relatorio.readRelatorio); 
-router.put('/relatorio/:id', Relatorio.updateRelatorio); 
-router.delete('/relatorio/:id', Relatorio.deleteRelatorio);
+router.post('/relatorio',Middleware.validaAcesso, Relatorio.createRelatorio);
+router.get('/relatorio/:id?',Middleware.validaAcesso, Relatorio.readRelatorio); 
+router.put('/relatorio/:id',Middleware.validaAcesso, Relatorio.updateRelatorio); 
+router.delete('/relatorio/:id',Middleware.validaAcesso, Relatorio.deleteRelatorio);
 
-router.post('/relatorio-json', RelatorioJson.createRelatorioJson);
-router.get('/relatorio-json/:id?', RelatorioJson.readRelatorioJson);
-router.put('/relatorio-json/:id', RelatorioJson.updateRelatorioJson);
-router.delete('/relatorio-json/:id', RelatorioJson.deleteRelatorioJson);
+router.post('/relatorio-json',Middleware.validaAcesso, RelatorioJson.createRelatorioJson);
+router.get('/relatorio-json/:id?',Middleware.validaAcesso, RelatorioJson.readRelatorioJson);
+router.put('/relatorio-json/:id',Middleware.validaAcesso, RelatorioJson.updateRelatorioJson);
+router.delete('/relatorio-json/:id',Middleware.validaAcesso, RelatorioJson.deleteRelatorioJson);
 
 
 router.get('/', (req, res) => { 

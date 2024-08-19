@@ -1,43 +1,63 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Carregar dados iniciais
-    loadTransactionData();
+    const token = localStorage.getItem('authToken');
 
-    // Configurar evento para salvar transação
-    document.getElementById('saveTransactionButton').addEventListener('click', async function () {
-        const transactionData = {
-            usuarioId: 1, // Ajuste conforme necessário
-            data: document.getElementById('transactionDate').value,
-            descricao: document.getElementById('transactionDescription').value,
-            categoria: document.getElementById('transactionCategory').value.toUpperCase(),
-            valor: parseFloat(document.getElementById('transactionAmount').value)
-        };
-        await saveTransaction(transactionData);
-    });
+    if (!token) {
+        // Redirecionar para a página de login se não estiver autenticado
+        window.location.href = '/login.html';
+    } else {
+        // Carregar dados iniciais
+        loadTransactionData();
+
+        // Configurar evento para salvar transação
+        document.getElementById('saveTransactionButton').addEventListener('click', async function () {
+            const transactionData = {
+                usuarioId: 1, // Ajuste conforme necessário, idealmente obtido do token
+                data: document.getElementById('transactionDate').value,
+                descricao: document.getElementById('transactionDescription').value,
+                categoria: document.getElementById('transactionCategory').value.toUpperCase(),
+                valor: parseFloat(document.getElementById('transactionAmount').value)
+            };
+            await saveTransaction(transactionData);
+        });
+    }
 });
 
 // Função para carregar transações
 async function loadTransactionData() {
+    const token = localStorage.getItem('authToken');
+
     try {
-        const response = await fetch('http://localhost:3000/api/transacao');
+        const response = await fetch('http://localhost:3000/api/transacao', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         if (!response.ok) {
             throw new Error('Erro ao carregar transações');
         }
         const transactions = await response.json();
-        updateDashboard(transactions); // Atualize o dashboard com as transações carregadas
-        displayTransactions(transactions); // Exiba as transações na tabela
-        updateCharts(transactions); // Atualize os gráficos com os dados carregados
+        updateDashboard(transactions);
+        displayTransactions(transactions);
+        updateCharts(transactions); // Atualiza todos os gráficos
     } catch (error) {
         console.error('Erro ao carregar transações:', error);
+        if (error.message === 'Unauthorized') {
+            // Redirecionar para login se a autenticação falhar
+            window.location.href = '/login.html';
+        }
     }
 }
 
 // Função para salvar transação
 async function saveTransaction(transactionData) {
+    const token = localStorage.getItem('authToken');
+
     try {
         const response = await fetch('http://localhost:3000/api/transacao', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(transactionData)
         });
@@ -47,9 +67,8 @@ async function saveTransaction(transactionData) {
             throw new Error(error.message || 'Erro ao salvar transação');
         }
 
-        // Fechar modal e atualizar a lista de transações
         document.getElementById('addTransactionModal').querySelector('.btn-close').click();
-        loadTransactionData(); // Atualize a lista de transações
+        loadTransactionData(); // Atualiza os dados e gráficos após salvar
     } catch (error) {
         console.error('Erro ao salvar transação:', error);
     }
@@ -63,12 +82,9 @@ function updateDashboard(transactions) {
     transactions.forEach(transaction => {
         if (transaction.categoria === 'RENDA') {
             balance += transaction.valor;
-        } else if (transaction.categoria === 'ALIMENTACAO' ||
-                   transaction.categoria === 'TRANSPORTE' ||
-                   transaction.categoria === 'UTILIDADES' ||
-                   transaction.categoria === 'ENTRETENIMENTO') {
+        } else if (['ALIMENTACAO', 'TRANSPORTE', 'UTILIDADES', 'ENTRETENIMENTO'].includes(transaction.categoria)) {
             balance -= transaction.valor;
-            expenses += transaction.valor; // Adiciona o valor dos gastos
+            expenses += transaction.valor;
         }
     });
 
@@ -92,12 +108,11 @@ function displayTransactions(transactions) {
 }
 
 // Função para atualizar os gráficos
-function updateCharts(transactions) {
+function updateCharts(transactions, updateCategories = true) {
     const categories = {};
     let income = 0;
     let totalExpenses = 0;
 
-    // Organizar os dados para os gráficos
     transactions.forEach(transaction => {
         if (transaction.categoria === 'RENDA') {
             income += transaction.valor;
@@ -110,7 +125,7 @@ function updateCharts(transactions) {
         }
     });
 
-    // Atualizar gráfico de fluxo de caixa (linha)
+    // Atualizar gráfico de fluxo de caixa
     const cashFlowChartContext = document.getElementById('cashFlowChart').getContext('2d');
     new Chart(cashFlowChartContext, {
         type: 'line',
@@ -118,12 +133,12 @@ function updateCharts(transactions) {
             labels: ['Renda', 'Gastos'],
             datasets: [{
                 label: 'Fluxo de Caixa',
-                data: [income, -totalExpenses], // Use valores negativos para representar gastos
+                data: [income, -totalExpenses],
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
                 fill: true,
-                tension: 0.1 // Curva da linha
+                tension: 0.1
             }]
         },
         options: {
@@ -140,41 +155,43 @@ function updateCharts(transactions) {
         }
     });
 
-    // Atualizar gráfico de categorias de despesas (pizza)
-    const expensePieChartContext = document.getElementById('expensePieChart').getContext('2d');
-    new Chart(expensePieChartContext, {
-        type: 'pie',
-        data: {
-            labels: ['Alimentação', 'Transporte', 'Utilidades', 'Entretenimento'],
-            datasets: [{
-                label: 'Despesas por Categoria',
-                data: [
-                    categories['ALIMENTACAO'] || 0,
-                    categories['TRANSPORTE'] || 0,
-                    categories['UTILIDADES'] || 0,
-                    categories['ENTRETENIMENTO'] || 0
-                ],
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-                borderColor: '#ffffff',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            const label = tooltipItem.label || '';
-                            const value = tooltipItem.raw;
-                            return `${label}: R$ ${value.toFixed(2)}`;
+    // Atualizar gráfico de categorias se necessário
+    if (updateCategories) {
+        const expensePieChartContext = document.getElementById('expensePieChart').getContext('2d');
+        new Chart(expensePieChartContext, {
+            type: 'pie',
+            data: {
+                labels: ['Alimentação', 'Transporte', 'Utilidades', 'Entretenimento'],
+                datasets: [{
+                    label: 'Despesas por Categoria',
+                    data: [
+                        categories['ALIMENTACAO'] || 0,
+                        categories['TRANSPORTE'] || 0,
+                        categories['UTILIDADES'] || 0,
+                        categories['ENTRETENIMENTO'] || 0
+                    ],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const label = tooltipItem.label || '';
+                                const value = tooltipItem.raw;
+                                return `${label}: R$ ${value.toFixed(2)}`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 }
