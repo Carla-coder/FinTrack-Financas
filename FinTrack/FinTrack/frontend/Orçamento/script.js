@@ -1,194 +1,113 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const token = localStorage.getItem('authToken');
+document.addEventListener('DOMContentLoaded', () => {
+    const openModalBtn = document.getElementById('openModalBtn');
+    const filterModal = document.getElementById('filterModal');
+    const closeModal = document.querySelector('.modal .close');
+    const filterForm = document.getElementById('filterForm');
+    const dataTable = document.getElementById('dataTable');
+    
+    let categoryChart, budgetChart;
 
-    if (!token) {
-        // Redirecionar para a página de login se não estiver autenticado
-        window.location.href = '/login.html';
-    } else {
-        // Carregar dados iniciais
-        loadBudgetData();
-        loadTransactionData();
-
-        // Configurar evento para definir orçamento
-        document.getElementById('setBudgetButton').addEventListener('click', async function () {
-            const budgetData = {
-                categoria: document.getElementById('category').value.toUpperCase(),
-                valor: parseFloat(document.getElementById('budgetAmount').value)
-            };
-            await setBudget(budgetData);
-        });
-    }
-});
-
-// Função para carregar dados de orçamento
-async function loadBudgetData() {
-    const token = localStorage.getItem('authToken');
-
-    try {
-        const response = await fetch('http://localhost:3000/api/orcamento', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Erro ao carregar orçamentos');
+    // Show modal
+    openModalBtn.onclick = () => filterModal.style.display = 'block';
+    
+    // Close modal
+    closeModal.onclick = () => filterModal.style.display = 'none';
+    window.onclick = (event) => {
+        if (event.target === filterModal) {
+            filterModal.style.display = 'none';
         }
-        const budgetData = await response.json();
-        updateBudgetPieChart(budgetData);
-        updateBudgetTable(budgetData);
-    } catch (error) {
-        console.error('Erro ao carregar orçamentos:', error);
-        if (error.message === 'Unauthorized') {
-            window.location.href = '/login.html';
+    };
+
+    // Fetch data and create charts
+    const fetchData = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/api/transacao', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Erro ao buscar dados:', error);
         }
-    }
-}
+    };
 
-// Função para carregar transações
-async function loadTransactionData() {
-    const token = localStorage.getItem('authToken');
+    const updateCharts = (transactions) => {
+        const categories = [...new Set(transactions.map(t => t.categoria))];
+        const categoryAmounts = categories.map(c => transactions.filter(t => t.categoria === c).reduce((sum, t) => sum + t.valor, 0));
 
-    try {
-        const response = await fetch('http://localhost:3000/api/transacao', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Erro ao carregar transações');
-        }
-        const transactions = await response.json();
-        updateSpendingChart(transactions);
-    } catch (error) {
-        console.error('Erro ao carregar transações:', error);
-        if (error.message === 'Unauthorized') {
-            window.location.href = '/login.html';
-        }
-    }
-}
-
-// Função para definir orçamento
-async function setBudget(budgetData) {
-    const token = localStorage.getItem('authToken');
-
-    try {
-        const response = await fetch('http://localhost:3000/api/orcamento', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+        const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+        if (categoryChart) categoryChart.destroy();
+        categoryChart = new Chart(ctxCategory, {
+            type: 'pie',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Gastos por Categoria',
+                    data: categoryAmounts,
+                    backgroundColor: categories.map(() => `#${Math.floor(Math.random()*16777215).toString(16)}`),
+                }]
             },
-            body: JSON.stringify(budgetData)
+            options: {
+                responsive: true
+            }
         });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Erro ao definir orçamento');
-        }
-
-        loadBudgetData(); // Atualiza os dados após definir orçamento
-    } catch (error) {
-        console.error('Erro ao definir orçamento:', error);
-    }
-}
-
-// Função para atualizar o gráfico de pizza do orçamento
-function updateBudgetPieChart(budgetData) {
-    const categories = {};
-    budgetData.forEach(item => {
-        categories[item.categoria] = item.valor;
-    });
-
-    const ctx = document.getElementById('budgetPieChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(categories),
-            datasets: [{
-                label: 'Orçamento por Categoria',
-                data: Object.values(categories),
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-                borderColor: '#ffffff',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            const label = tooltipItem.label || '';
-                            const value = tooltipItem.raw;
-                            return `${label}: R$ ${value.toFixed(2)}`;
-                        }
-                    }
-                }
+        const ctxBudget = document.getElementById('budgetChart').getContext('2d');
+        if (budgetChart) budgetChart.destroy();
+        budgetChart = new Chart(ctxBudget, {
+            type: 'bar',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Valores Estipulados',
+                    data: categories.map(() => 0), // Placeholder data
+                    backgroundColor: '#ff5722',
+                }]
+            },
+            options: {
+                responsive: true
             }
-        }
-    });
-}
+        });
+    };
 
-// Função para atualizar o gráfico de gastos
-function updateSpendingChart(transactions) {
-    const categories = {};
-    let totalSpending = 0;
+    // Handle form submission
+    filterForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const category = document.getElementById('category').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const amount = parseFloat(document.getElementById('amount').value);
 
-    transactions.forEach(transaction => {
-        if (!categories[transaction.categoria]) {
-            categories[transaction.categoria] = 0;
-        }
-        categories[transaction.categoria] += transaction.valor;
-        totalSpending += transaction.valor;
-    });
+        const transactions = await fetchData();
+        const filtered = transactions.filter(t =>
+            (!category || t.categoria === category) &&
+            (!startDate || new Date(t.data) >= new Date(startDate)) &&
+            (!endDate || new Date(t.data) <= new Date(endDate))
+        );
 
-    // Atualizar gráfico de gastos
-    const ctx = document.getElementById('spendingChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(categories),
-            datasets: [{
-                label: 'Gastos por Categoria',
-                data: Object.values(categories),
-                backgroundColor: '#36A2EB',
-                borderColor: '#ffffff',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'R$ ' + value;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
+        updateCharts(filtered);
 
-// Função para atualizar a tabela de orçamento
-function updateBudgetTable(budgetData) {
-    const tbody = document.getElementById('budgetTableBody');
-    tbody.innerHTML = '';
-    budgetData.forEach(item => {
-        const status = item.gasto > item.valor ? 'Acima do Orçamento' : 'Dentro do Orçamento';
-        const row = `<tr>
-            <td>${item.mes}</td>
-            <td>${item.categoria}</td>
-            <td>R$ ${item.valor.toFixed(2)}</td>
-            <td>R$ ${item.estipulado.toFixed(2)}</td>
-            <td>R$ ${item.gasto.toFixed(2)}</td>
-            <td>${status}</td>
-        </tr>`;
-        tbody.innerHTML += row;
+        const tableRows = filtered.map(t => {
+            const status = t.valor > amount ? 'Acima do Orçamento' : 'Dentro do Orçamento';
+            return `
+                <tr>
+                    <td>${new Date(t.data).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' })}</td>
+                    <td>${t.categoria}</td>
+                    <td>${amount.toFixed(2)}</td>
+                    <td>${t.valor.toFixed(2)}</td>
+                    <td>${status}</td>
+                </tr>
+            `;
+        }).join('');
+
+        dataTable.innerHTML = tableRows;
+        filterModal.style.display = 'none';
+    };
+
+    // Initial data fetch and chart setup
+    fetchData().then(transactions => {
+        updateCharts(transactions);
     });
-}
+});

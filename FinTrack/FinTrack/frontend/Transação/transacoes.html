@@ -22,64 +22,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link" href="../Dashboard/dashboard.html">Dashboard</a></li>
-<<<<<<< HEAD
-            <li class="nav-item"><a class="nav-link active" aria-current="page" href="../Transação/transacoes.html">Transações</a>
+            <li class="nav-item"><a class="nav-link active" aria-current="page"
+                href="../Transação/transacoes.html">Transações</a>
             </li>
             <li class="nav-item"><a class="nav-link" href="../Orçamento/orcamentos.html">Orçamentos</a></li>
             <li class="nav-item"><a class="nav-link" href="../Relatório/relatorios.html">Relatórios</a></li>
-=======
-            <li class="nav-item"><a class="nav-link active" aria-current="page" href="transacoes.html">Transações</a>
-            </li>
-            <li class="nav-item"><a class="nav-link" href="orcamentos.html">Orçamentos</a></li>
-            <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
->>>>>>> 6dba269aedc05506d818ab13d97dc5634de30b8c
           </ul>
         </div>
       </div>
     </nav>
 
-<<<<<<< HEAD
-    <div id="dashboard">
-      <h2>Dashboard</h2>
-      <p><strong>Saldo Atual:</strong> <span id="currentBalance">R$ 0,00</span></p>
-      <p><strong>Despesas Mensais:</strong> <span id="monthlyExpenses">R$ 0,00</span></p>
-    </div>
-
-    <div id="transactions">
-      <h2 class="mb-4">Transações</h2>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Lista de Transações</h5>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Descrição</th>
-                <th>Categoria</th>
-                <th>Valor</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="transactionTableBody">
-              <!-- As transações serão renderizadas aqui -->
-            </tbody>
-            <div id="loading" class="text-center my-3">
-              <span>Carregando mais transações...</span>
-            </div>
-            
-          </table>
-          <nav aria-label="Navegação de página">
-            <ul class="pagination justify-content-center" id="pagination">
-              <!-- Paginação será inserida aqui -->
-            </ul>
-          </nav>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-lg rounded-circle btn-add" data-bs-toggle="modal"
-        data-bs-target="#addTransactionModal">+</button>
-    </div>
-
-=======
     <div id="transactions">
       <h2 class="mb-4">Transações</h2>
       <div class="card">
@@ -110,7 +62,6 @@
         data-bs-target="#addTransactionModal">+</button>
     </div>
 
->>>>>>> 6dba269aedc05506d818ab13d97dc5634de30b8c
     <!-- Modal para adicionar transação -->
     <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel"
       aria-hidden="true">
@@ -121,7 +72,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form id="transactionForm">
+            <form id="addTransactionForm">
               <div class="mb-3">
                 <label for="transactionDate" class="form-label">Data</label>
                 <input type="date" class="form-control" id="transactionDate" required />
@@ -148,7 +99,7 @@
       </div>
     </div>
 
-    <!-- Modal de Edição -->
+    <!-- Modal de Edição de Transação -->
     <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel"
       aria-hidden="true">
       <div class="modal-dialog">
@@ -161,33 +112,34 @@
             <form id="editTransactionForm">
               <input type="hidden" id="editTransactionId">
               <div class="mb-3">
+                <label for="editTransactionDate" class="form-label">Data</label>
+                <input type="date" class="form-control" id="editTransactionDate">
+              </div>
+              <div class="mb-3">
                 <label for="editTransactionDescription" class="form-label">Descrição</label>
-                <input type="text" class="form-control" id="editTransactionDescription" required>
+                <input type="text" class="form-control" id="editTransactionDescription">
+              </div>
+              <div class="mb-3">
+                <label for="editTransactionCategory" class="form-label">Categoria</label>
+                <input type="text" class="form-control" id="editTransactionCategory">
               </div>
               <div class="mb-3">
                 <label for="editTransactionAmount" class="form-label">Valor</label>
-                <input type="number" step="0.01" class="form-control" id="editTransactionAmount" required>
+                <input type="number" class="form-control" id="editTransactionAmount" step="0.01">
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-primary" id="updateTransactionButton">Atualizar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" id="updateTransactionButton">Salvar alterações</button>
           </div>
         </div>
       </div>
     </div>
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 6dba269aedc05506d818ab13d97dc5634de30b8c
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
+  </div>
 </body>
 
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> 6dba269aedc05506d818ab13d97dc5634de30b8c

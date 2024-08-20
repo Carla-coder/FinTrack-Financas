@@ -2,17 +2,14 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const createTransacao = async (req, res) => {
-    const { usuarioId, data, descricao, categoria, valor, tags } = req.body;
+    const { data, descricao, categoria, valor, tags } = req.body;
+    const usuarioId = req.user.id; // Obtém o ID do usuário autenticado
 
-    if (!usuarioId || !data || !descricao || !categoria || !valor) {
+    if (!data || !descricao || !categoria || !valor) {
         return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
     }
 
     try {
-<<<<<<< HEAD
-        const { data, descricao, categoria, valor, tags } = req.body;
-        const usuarioId = req.user.id; // Obtém o ID do usuário autenticado
-
         // Validar categoria
         const validCategorias = ['RENDA', 'ALIMENTACAO', 'TRANSPORTE', 'UTILIDADES', 'ENTRETENIMENTO'];
         if (!validCategorias.includes(categoria)) {
@@ -20,8 +17,6 @@ const createTransacao = async (req, res) => {
         }
 
         // Criar transação
-=======
->>>>>>> 6dba269aedc05506d818ab13d97dc5634de30b8c
         const transacao = await prisma.transacao.create({
             data: {
                 usuario: {

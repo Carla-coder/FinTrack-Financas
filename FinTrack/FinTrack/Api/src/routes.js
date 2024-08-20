@@ -18,17 +18,11 @@ router.get('/usuarios/:id', Middleware.validaAcesso, Usuario.read);
 router.put('/usuarios/:id', Middleware.validaAcesso, Usuario.update);
 router.delete('/usuarios/:id', Middleware.validaAcesso, Usuario.del);
 
-<<<<<<< HEAD
 router.post('/transacao',Middleware.validaAcesso, transacaoController.createTransacao);
 router.get('/transacao/:id?',Middleware.validaAcesso, transacaoController.readTransacao);
 router.put('/transacao/:id', Middleware.validaAcesso, transacaoController.updateTransacao);
 router.delete('/transacao/:id',Middleware.validaAcesso, transacaoController.deleteTransacao);
-=======
-router.post('/transacao', Middleware.validaAcesso, transacaoController.createTransacao);
-router.get('/transacao/:id?', Middleware.validaAcesso, transacaoController.readTransacao);
-router.put('/transacao/:id', Middleware.validaAcesso, transacaoController.updateTransacao);
-router.delete('/transacao/:id', Middleware.validaAcesso, transacaoController.deleteTransacao);
->>>>>>> 6dba269aedc05506d818ab13d97dc5634de30b8c
+
 
 router.post('/categoria',Middleware.validaAcesso, Categoria.createCategoria);
 router.get('/categoria/:id?',Middleware.validaAcesso, Categoria.readCategoria);
