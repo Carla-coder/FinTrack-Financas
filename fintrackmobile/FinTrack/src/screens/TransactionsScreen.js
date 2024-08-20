@@ -86,9 +86,6 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Suponho que transactions sejam carregadas de AsyncStorage na vida real.
-// Se não for o caso, você pode mover a lógica de carga do `DashboardScreen` para cá.
-
 export default function TransactionsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [description, setDescription] = useState("");
@@ -97,6 +94,8 @@ export default function TransactionsScreen() {
   const [category, setCategory] = useState("");
   const [type, setType] = useState("");
   const [transactions, setTransactions] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [editItem, setEditItem] = useState(null);
 
   // Carregar transações salvas
   React.useEffect(() => {
@@ -149,6 +148,57 @@ export default function TransactionsScreen() {
     }
   };
 
+  const handleEditTransaction = (item) => {
+    setEditItem(item);
+    setDescription(item.description);
+    setAmount(item.amount.toString());
+    setDate(item.date);
+    setCategory(item.category);
+    setType(item.type);
+    setEditMode(true);
+    setModalVisible(true);
+  };
+
+  const handleUpdateTransaction = async () => {
+    if (editItem && description && amount && date && category && type) {
+      const updatedTransaction = {
+        ...editItem,
+        description,
+        amount: parseFloat(amount),
+        date,
+        category,
+        type,
+      };
+
+      const updatedTransactions = transactions.map((item) =>
+        item.id === editItem.id ? updatedTransaction : item
+      );
+
+      setTransactions(updatedTransactions);
+
+      // Salvar no AsyncStorage
+      try {
+        await AsyncStorage.setItem(
+          "transactions",
+          JSON.stringify(updatedTransactions)
+        );
+      } catch (error) {
+        console.error("Erro ao salvar transações:", error);
+      }
+
+      setEditItem(null);
+      setEditMode(false);
+      setDescription("");
+      setAmount("");
+      setDate("");
+      setCategory("");
+      setType("");
+      setModalVisible(false);
+    } else {
+      alert("Por favor, preencha todos os campos.");
+    }
+  };
+
   const formatDate = (text) => {
     const numbers = text.replace(/\D/g, "");
     let formattedDate = "";
@@ -168,28 +218,45 @@ export default function TransactionsScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={transactions}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.transactionItem}>
-            <Text>{item.date}</Text>
-            <Text>{item.description}</Text>
-            <Text>{item.category}</Text>
-            <Text>{item.type}</Text>
-            <Text
-              style={[
-                styles.transactionAmount,
-                { color: item.type === "renda" ? "blue" : "red" },
-              ]}
-            >
-              {item.type === "renda"
-                ? `+ R$ ${item.amount.toFixed(2)}`
-                : `- R$ ${item.amount.toFixed(2)}`}
-            </Text>
-          </View>
-        )}
-      />
+      <View style={styles.transactionsContainer}>
+        <Text style={styles.transactionsTitle}>Novas Transações:</Text>
+        <View style={styles.transactionHeader}>
+          <Text style={styles.transactionHeaderText}>Data</Text>
+          <Text style={styles.transactionHeaderText}>Descrição</Text>
+          <Text style={styles.transactionHeaderText}>Categoria</Text>
+          <Text style={styles.transactionHeaderText}>Tipo</Text>
+          <Text style={styles.transactionHeaderText}>Valor</Text>
+          <Text style={styles.transactionHeaderText}>Ação</Text>
+        </View>
+        <FlatList
+          data={transactions}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.transactionItem}>
+              <Text style={styles.transactionDetail}>{item.date}</Text>
+              <Text style={styles.transactionDetail}>{item.description}</Text>
+              <Text style={styles.transactionDetail}>{item.category}</Text>
+              <Text style={styles.transactionDetail}>{item.type}</Text>
+              <Text
+                style={[
+                  styles.transactionAmount,
+                  { color: item.type === "renda" ? "blue" : "red" },
+                ]}
+              >
+                {item.type === "renda"
+                  ? `+ R$ ${item.amount.toFixed(2)}`
+                  : `- R$ ${item.amount.toFixed(2)}`}
+              </Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => handleEditTransaction(item)}
+              >
+                <Text style={styles.editButtonText}>Editar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      </View>
 
       <Modal
         animationType="slide"
@@ -200,7 +267,9 @@ export default function TransactionsScreen() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Adicionar Nova Transação</Text>
+              <Text style={styles.modalTitle}>
+                {editMode ? "Editar Transação" : "Adicionar Nova Transação"}
+              </Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
@@ -269,9 +338,11 @@ export default function TransactionsScreen() {
 
             <TouchableOpacity
               style={styles.saveButton}
-              onPress={handleAddTransaction}
+              onPress={editMode ? handleUpdateTransaction : handleAddTransaction}
             >
-              <Text style={styles.saveButtonText}>Salvar</Text>
+              <Text style={styles.saveButtonText}>
+                {editMode ? "Atualizar" : "Salvar"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -291,15 +362,55 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  transactionsContainer: {
+    marginBottom: 20,
+  },
+  transactionsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  transactionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingBottom: 5,
+    marginBottom: 10,
+  },
+  transactionHeaderText: {
+    fontWeight: "bold",
+    flex: 1,
+    textAlign: "center",
+  },
   transactionItem: {
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+  },
+  transactionDetail: {
+    flex: 1,
+    textAlign: "center",
   },
   transactionAmount: {
     fontSize: 16,
+    flex: 1,
+    textAlign: "center",
+  },
+  editButton: {
+    backgroundColor: "#ffcc00",
+    padding: 5,
+    borderRadius: 5,
+    marginLeft: 10,
+    flex: 1,
+    alignItems: "center",
+  },
+  editButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
