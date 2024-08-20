@@ -604,7 +604,6 @@
 //   },
 // });
 
-
 import React, { useState } from "react";
 import {
   View,
@@ -828,15 +827,16 @@ export default function DashboardScreen() {
             <Text style={styles.transactionHeaderText}>Tipo</Text>
             <Text style={styles.transactionHeaderText}>Valor</Text>
           </View>
+
           <FlatList
-            data={transactions}
+            data={transactions.slice(-3)}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View style={styles.transactionItem}>
-                <Text>{item.date}</Text>
-                <Text>{item.description}</Text>
-                <Text>{item.category}</Text>
-                <Text>{item.type}</Text>
+                <Text style={styles.transactionDetail}>{item.date}</Text>
+                <Text style={styles.transactionDetail}>{item.description}</Text>
+                <Text style={styles.transactionDetail}>{item.category}</Text>
+                <Text style={styles.transactionDetail}>{item.type}</Text>
                 <Text
                   style={[
                     styles.transactionAmount,
@@ -869,6 +869,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#8ccaef",
     paddingVertical: 10,
     paddingHorizontal: 15,
+    // borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -885,6 +886,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     backgroundColor: "#fff",
     padding: 10,
+    // borderRadius: 5,
     elevation: 2,
     marginBottom: 10,
     shadowColor: "#000",
@@ -894,14 +896,10 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     fontSize: 18,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
+    paddingVertical: 5,
   },
   scrollView: {
     flexGrow: 1,
-    paddingBottom: 100,
   },
   balanceContainer: {
     flexDirection: "row",
@@ -910,65 +908,85 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   card: {
-    flex: 1,
-    padding: 10,
-    marginHorizontal: 5,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    // borderRadius: 8,
     backgroundColor: "#fff",
+    padding: 15,
+    // borderRadius: 10,
+    elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
+    width: "48%",
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   balance: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 20,
   },
   chartContainer: {
     marginBottom: 20,
+    backgroundColor: "#fff",
+    // borderRadius: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   chartTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   chart: {
-    borderRadius: 8,
+    // borderRadius: 10,
   },
   transactionsContainer: {
-    marginBottom: 20,
+    backgroundColor: "#fff",
+    // borderRadius: 8,
+    padding: 10,
+    width: "100%",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   transactionsTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    textAlign: "left",
   },
   transactionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#e0e0e0",
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
   },
   transactionHeaderText: {
     fontWeight: "bold",
+    flex: 1,
+    textAlign: "left",
   },
   transactionItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#ddd",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  transactionDetail: {
+    width: "20%",
+    textAlign: "left",
   },
   transactionAmount: {
-    fontWeight: "bold",
+    width: "20%",
+    fontSize: 16,
+    textAlign: "left",
   },
 });

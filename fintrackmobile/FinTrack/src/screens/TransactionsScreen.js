@@ -86,9 +86,6 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Suponho que transactions sejam carregadas de AsyncStorage na vida real.
-// Se não for o caso, você pode mover a lógica de carga do `DashboardScreen` para cá.
-
 export default function TransactionsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [description, setDescription] = useState("");
@@ -97,6 +94,8 @@ export default function TransactionsScreen() {
   const [category, setCategory] = useState("");
   const [type, setType] = useState("");
   const [transactions, setTransactions] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [editItem, setEditItem] = useState(null);
 
   // Carregar transações salvas
   React.useEffect(() => {
@@ -115,11 +114,11 @@ export default function TransactionsScreen() {
   }, []);
 
   const handleAddTransaction = async () => {
-    if (description && amount && date && category && type) {
+    if (description && !isNaN(amount) && date && category && type) {
       const newTransaction = {
         id: transactions.length + 1,
         description,
-        amount: parseFloat(amount),
+        amount: parseFloat(amount).toFixed(2),
         date,
         category,
         type,
@@ -138,6 +137,57 @@ export default function TransactionsScreen() {
         console.error("Erro ao salvar transações:", error);
       }
 
+      setDescription("");
+      setAmount("");
+      setDate("");
+      setCategory("");
+      setType("");
+      setModalVisible(false);
+    } else {
+      alert("Por favor, preencha todos os campos.");
+    }
+  };
+
+  const handleEditTransaction = (item) => {
+    setEditItem(item);
+    setDescription(item.description);
+    setAmount(item.amount.toString());
+    setDate(item.date);
+    setCategory(item.category);
+    setType(item.type);
+    setEditMode(true);
+    setModalVisible(true);
+  };
+
+  const handleUpdateTransaction = async () => {
+    if (editItem && description && amount && date && category && type) {
+      const updatedTransaction = {
+        ...editItem,
+        description,
+        amount: parseFloat(amount).toFixed(2),
+        date,
+        category,
+        type,
+      };
+
+      const updatedTransactions = transactions.map((item) =>
+        item.id === editItem.id ? updatedTransaction : item
+      );
+
+      setTransactions(updatedTransactions);
+
+      // Salvar no AsyncStorage
+      try {
+        await AsyncStorage.setItem(
+          "transactions",
+          JSON.stringify(updatedTransactions)
+        );
+      } catch (error) {
+        console.error("Erro ao salvar transações:", error);
+      }
+
+      setEditItem(null);
+      setEditMode(false);
       setDescription("");
       setAmount("");
       setDate("");
@@ -168,28 +218,47 @@ export default function TransactionsScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={transactions}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.transactionItem}>
-            <Text>{item.date}</Text>
-            <Text>{item.description}</Text>
-            <Text>{item.category}</Text>
-            <Text>{item.type}</Text>
-            <Text
-              style={[
-                styles.transactionAmount,
-                { color: item.type === "renda" ? "blue" : "red" },
-              ]}
-            >
-              {item.type === "renda"
-                ? `+ R$ ${item.amount.toFixed(2)}`
-                : `- R$ ${item.amount.toFixed(2)}`}
-            </Text>
-          </View>
-        )}
-      />
+      <View style={styles.transactionsContainer}>
+        <Text style={styles.transactionsTitle}>Transações</Text>
+        <View style={styles.transactionHeader}>
+          <Text style={styles.transactionHeaderText}>Data</Text>
+          <Text style={styles.transactionHeaderText}>Descrição</Text>
+          <Text style={styles.transactionHeaderText}>Categoria</Text>
+          <Text style={styles.transactionHeaderText}>Tipo</Text>
+          <Text style={styles.transactionHeaderText}>Valor</Text>
+          <Text style={styles.transactionHeaderText}>Ação</Text>
+        </View>
+
+        <FlatList
+          data={transactions}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.transactionItem}>
+              <Text style={styles.transactionDetail}>{item.date}</Text>
+              <Text style={styles.transactionDetail}>{item.description}</Text>
+              <Text style={styles.transactionDetail}>{item.category}</Text>
+              <Text style={styles.transactionDetail}>{item.type}</Text>
+              <Text
+                style={[
+                  styles.transactionAmount,
+                  { color: item.type === "renda" ? "blue" : "red" },
+                ]}
+              >
+                {item.type === "renda"
+                  ? `+ R$ ${item.amount}`
+                  : `- R$ ${item.amount}`}
+              </Text>
+
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => handleEditTransaction(item)}
+              >
+                <Text style={styles.editButtonText}>Editar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      </View>
 
       <Modal
         animationType="slide"
@@ -200,7 +269,9 @@ export default function TransactionsScreen() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Adicionar Nova Transação</Text>
+              <Text style={styles.modalTitle}>
+                {editMode ? "Editar Transação" : "Adicionar Nova Transação"}
+              </Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
@@ -269,9 +340,11 @@ export default function TransactionsScreen() {
 
             <TouchableOpacity
               style={styles.saveButton}
-              onPress={handleAddTransaction}
+              onPress={editMode ? handleUpdateTransaction : handleAddTransaction}
             >
-              <Text style={styles.saveButtonText}>Salvar</Text>
+              <Text style={styles.saveButtonText}>
+                {editMode ? "Atualizar" : "Salvar"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -291,15 +364,78 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  // transactionsContainer: {
+  //   marginBottom: 20,
+  // },
+  transactionsContainer: {
+    backgroundColor: "#fff",
+    // borderRadius: 8,
+    padding: 10,
+    width: "100%",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  transactionsTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#8ccaef",
+  },
+  transactionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#e0e0e0",
+    padding: 10,
+    // borderBottomWidth: 1,
+    // borderBottomColor: "#ddd",
+    // paddingBottom: 5,
+    // marginBottom: 10,
+  },
+  transactionHeaderText: {
+    fontWeight: "bold",
+    flex: 1,
+    textAlign: "left",
+    // paddingHorizontal: 5, 
+  },
   transactionItem: {
+    flexDirection: "row",
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-    flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start", // antes estava space-between
+    alignItems: "center", // antes estava left
+  },
+  transactionDetail: {
+    // flex: 1,
+    // fontSize: 16,
+    textAlign: "left",
+    // paddingHorizontal: 5,
+    width: "20%", // antes estava flex: 1
   },
   transactionAmount: {
+    width: "20%", // antes estava flex: 1
+    // flex: 1,
     fontSize: 16,
+    // paddingHorizontal: 5,
+    textAlign: "left",
+  },
+  editButton: {
+    backgroundColor: "#ffcc00",
+    padding: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+    // flex: 1,
+    minWidth: 50,
+    alignItems: "center",
+  },
+  editButtonText: {
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 12,
   },
   modalContainer: {
     flex: 1,
