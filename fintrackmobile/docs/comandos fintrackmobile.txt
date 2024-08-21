@@ -12,7 +12,7 @@ yarn add react-native-svg
 yarn add @react-native-async-storage/async-storage
 npm install react-native-chart-kit
 
-// atualizações recomendadas
+// atualizações recomendadas ( quando fui converter os decimais para centavos)
 yarn add @expo/metro-runtime@~3.2.3
 yarn add @react-native-async-storage/async-storage@1.23.1
 yarn add expo@~51.0.28
