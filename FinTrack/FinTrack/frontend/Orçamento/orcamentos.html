@@ -7,38 +7,7 @@
   <title>Gestão Financeira - Orçamentos</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: "Arial", sans-serif;
-      background-color: #f4f4f4;
-    }
-
-    .app-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .card {
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-add {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
-
-    .progress {
-      height: 25px;
-    }
-
-    .progress-bar {
-      line-height: 25px;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -53,16 +22,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="dashboard.html">Dashboard</a>
+              <a class="nav-link" href="../Dashboard/dashboard.html">Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="transacoes.html">Transações</a>
+              <a class="nav-link" href="../Transação/transacoes.html">Transações</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="orcamentos.html">Orçamentos</a>
+              <a class="nav-link active" aria-current="page" href="../Orçamento/orcamentos.html">Orçamentos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="relatorios.html">Relatórios</a>
+              <a class="nav-link" href="../Relatório/relatorios.html">Relatórios</a>
             </li>
           </ul>
         </div>
@@ -75,7 +44,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Visão Geral por Categoria</h5>
+            <h5 class="card-title">Orçamento do Mês</h5>
             <div id="budgetOverview"></div>
           </div>
         </div>
@@ -147,208 +116,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        window.location.href = '/login.html';
-      } else {
-        loadTransactionData();
-      }
-
-      document.getElementById('budgetForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const category = document.getElementById('budgetCategory').value.trim().toUpperCase();
-        const amount = parseFloat(document.getElementById('budgetAmount').value);
-
-        if (category && !isNaN(amount)) {
-          const response = await fetch('http://localhost:3000/api/orcamento', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              usuarioId: 1, // Ajuste conforme necessário
-              categoria: category,
-              valor: amount
-            })
-          });
-
-          if (response.ok) {
-            loadTransactionData();
-            const addBudgetModal = new bootstrap.Modal(document.getElementById('addBudgetModal'));
-            addBudgetModal.hide();
-          } else {
-            alert('Erro ao adicionar orçamento');
-          }
-        } else {
-          alert('Por favor, preencha todos os campos corretamente.');
-        }
-      });
-    });
-
-
-    async function loadTransactionData() {
-      const token = localStorage.getItem('authToken');
-      try {
-        const response = await fetch('http://localhost:3000/api/transacao', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Erro ao carregar transações');
-        }
-        const transactions = await response.json();
-        renderTransactions(transactions);
-        updateCharts(transactions);
-        loadBudgetOverview();
-      } catch (error) {
-        console.error('Erro ao carregar transações:', error);
-      }
-    }
-
-    async function loadBudgetOverview() {
-      const token = localStorage.getItem('authToken');
-      try {
-        const response = await fetch('http://localhost:3000/api/orcamento', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Erro ao carregar orçamentos');
-        }
-        const budgets = await response.json();
-        const budgetOverview = document.getElementById('budgetOverview');
-        budgetOverview.innerHTML = '';
-
-        const budgetMap = {};
-
-        budgets.forEach(budget => {
-          const categoria = budget.categoria || 'N/A';
-          const valor = typeof budget.valor === 'number' ? budget.valor : 0;
-          budgetMap[categoria] = valor;
-
-          const budgetElement = document.createElement('div');
-          budgetElement.className = 'alert alert-info';
-          budgetElement.textContent = `${categoria}: R$ ${valor.toFixed(2)}`;
-          budgetOverview.appendChild(budgetElement);
-        });
-      } catch (error) {
-        console.error('Erro ao carregar orçamentos:', error);
-      }
-    }
-
-    function renderTransactions(transactions) {
-      const historicoTable = document.getElementById('historicoTable');
-      historicoTable.innerHTML = ''; // Limpa a tabela existente
-
-      const budgetMap = {};
-      const expenseMap = {};
-
-      transactions.forEach(transaction => {
-        if (transaction.categoria === 'RENDA') {
-          return; 
-        }
-
-        const categoria = transaction.categoria || 'N/A';
-        const valor = typeof transaction.valor === 'number' ? transaction.valor : 0;
-
-        if (!expenseMap[categoria]) {
-          expenseMap[categoria] = { spent: 0 };
-        }
-        expenseMap[categoria].spent += valor;
-
-       
-      });
-
-      updateTableWithBudgetData(budgetMap, expenseMap);
-    }
-
-    async function updateTableWithBudgetData(budgetMap, expenseMap) {
-      const token = localStorage.getItem('authToken');
-      try {
-        const response = await fetch('http://localhost:3000/api/orcamento', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Erro ao carregar orçamentos');
-        }
-        const budgets = await response.json();
-
-        const historicoTable = document.getElementById('historicoTable');
-        budgets.forEach(budget => {
-          const categoria = budget.categoria || 'N/A';
-          const valorOrcado = typeof budget.valor === 'number' ? budget.valor : 0;
-
-          const gastos = expenseMap[categoria] ? expenseMap[categoria].spent : 0;
-          const status = gastos <= valorOrcado ? 'Dentro do Orçamento' : 'Acima do Orçamento';
-
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${new Date().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' })}</td>
-            <td>${categoria}</td>
-            <td>R$ ${valorOrcado.toFixed(2)}</td>
-            <td>R$ ${gastos.toFixed(2)}</td>
-            <td>${status}</td>
-          `;
-          historicoTable.appendChild(row);
-        });
-      } catch (error) {
-        console.error('Erro ao atualizar tabela com dados de orçamento:', error);
-      }
-    }
-
-    function updateCharts(transactions) {
-      const ctx = document.getElementById('budgetDetailsChart').getContext('2d');
-
-      const categories = {};
-      transactions.forEach(transaction => {
-        if (transaction.categoria === 'RENDA') return;
-
-        const categoria = transaction.categoria || 'N/A';
-        const valor = typeof transaction.valor === 'number' ? transaction.valor : 0;
-
-        if (!categories[categoria]) {
-          categories[categoria] = 0;
-        }
-        categories[categoria] += valor;
-      });
-
-      const labels = Object.keys(categories);
-      const data = Object.values(categories);
-
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Gastos por Categoria',
-            data: data,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            x: {
-              beginAtZero: true
-            },
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 
 </html>

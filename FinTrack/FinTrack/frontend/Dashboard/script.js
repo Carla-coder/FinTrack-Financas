@@ -130,15 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             transactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${new Date(transaction.data).toLocaleDateString('pt-BR')}</td>
-                    <td>${transaction.descricao}</td>
-                    <td>${transaction.categoria}</td>
-                    <td>R$ ${transaction.valor.toFixed(2)}</td>
-                `;
-                transactionTableBody.appendChild(row);
-
                 // Atualizar saldo e categorias de gasto
                 if (transaction.categoria === 'RENDA') {
                     balance += transaction.valor;
@@ -152,6 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const finalBalance = balance - monthlyExpenses;
             document.getElementById('currentBalance').textContent = `R$ ${finalBalance.toFixed(2)}`;
             document.getElementById('monthlyExpenses').textContent = `R$ ${monthlyExpenses.toFixed(2)}`;
+
+            // Mostrar apenas as 3 últimas transações na tabela
+            const latestTransactions = transactions.slice(-3);
+            latestTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(transaction.data).toLocaleDateString('pt-BR')}</td>
+                    <td>${transaction.descricao}</td>
+                    <td>${transaction.categoria}</td>
+                    <td>R$ ${transaction.valor.toFixed(2)}</td>
+                `;
+                transactionTableBody.appendChild(row);
+            });
 
             // Atualizar gráficos com base nas transações
             const cashFlowData = {
@@ -168,49 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Função para adicionar uma nova transação
-    const addTransaction = async () => {
-        const transactionDate = document.getElementById('transactionDate').value;
-        const transactionDescription = document.getElementById('transactionDescription').value;
-        const transactionCategory = document.getElementById('transactionCategory').value;
-        const transactionAmount = parseFloat(document.getElementById('transactionAmount').value);
-
-        if (!transactionDate || !transactionDescription || !transactionCategory || isNaN(transactionAmount)) {
-            alert('Preencha todos os campos corretamente.');
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:3000/api/transacao', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    usuarioId, // Incluir o usuarioId
-                    data: transactionDate,
-                    descricao: transactionDescription,
-                    categoria: transactionCategory,
-                    valor: transactionAmount
-                })
-            });
-
-            if (!response.ok) throw new Error('Erro ao adicionar transação.');
-
-            // Recarregar transações e atualizar o dashboard
-            loadTransactions();
-            document.getElementById('transactionForm').reset(); // Limpar o formulário
-            document.querySelector('#addTransactionModal .btn-close').click(); // Fechar modal
-        } catch (error) {
-            console.error('Erro ao adicionar transação:', error);
-        }
-    };
-
-    // Evento para salvar nova transação
-    document.getElementById('saveTransactionButton').addEventListener('click', addTransaction);
-
-    // Carregar dados iniciais
+    // Carregar os dados do dashboard e transações na inicialização
     loadDashboardData();
     loadTransactions();
+
+    // Event listener para o botão de adicionar transação (não está mais no modal)
+    document.getElementById('addTransactionButton').addEventListener('click', () => {
+        // Aqui você pode redirecionar para uma página onde o usuário pode adicionar uma nova transação
+        window.location.href = '../Transação/transacoes.html';
+    });
 });
