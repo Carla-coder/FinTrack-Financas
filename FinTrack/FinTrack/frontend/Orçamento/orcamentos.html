@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,29 +12,35 @@
       font-family: "Arial", sans-serif;
       background-color: #f4f4f4;
     }
+
     .app-container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
+
     .card {
       margin-bottom: 20px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
     .btn-add {
       position: fixed;
       bottom: 20px;
       right: 20px;
       z-index: 1000;
     }
+
     .progress {
       height: 25px;
     }
+
     .progress-bar {
       line-height: 25px;
     }
   </style>
 </head>
+
 <body>
   <div class="app-container">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
@@ -68,8 +75,8 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Orçamentos do Mês Atual</h5>
-            <canvas id="budgetOverviewChart"></canvas>
+            <h5 class="card-title">Visão Geral por Categoria</h5>
+            <div id="budgetOverview"></div>
           </div>
         </div>
       </div>
@@ -156,7 +163,7 @@
         const amount = parseFloat(document.getElementById('budgetAmount').value);
 
         if (category && !isNaN(amount)) {
-          const response = await fetch('http://localhost:3000/api/transacao', {
+          const response = await fetch('http://localhost:3000/api/orcamento', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -164,8 +171,6 @@
             },
             body: JSON.stringify({
               usuarioId: 1, // Ajuste conforme necessário
-              data: new Date().toISOString().split('T')[0], // Data atual
-              descricao: `Orçamento ${category}`,
               categoria: category,
               valor: amount
             })
@@ -184,6 +189,7 @@
       });
     });
 
+
     async function loadTransactionData() {
       const token = localStorage.getItem('authToken');
       try {
@@ -198,8 +204,41 @@
         const transactions = await response.json();
         renderTransactions(transactions);
         updateCharts(transactions);
+        loadBudgetOverview();
       } catch (error) {
         console.error('Erro ao carregar transações:', error);
+      }
+    }
+
+    async function loadBudgetOverview() {
+      const token = localStorage.getItem('authToken');
+      try {
+        const response = await fetch('http://localhost:3000/api/orcamento', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Erro ao carregar orçamentos');
+        }
+        const budgets = await response.json();
+        const budgetOverview = document.getElementById('budgetOverview');
+        budgetOverview.innerHTML = '';
+
+        const budgetMap = {};
+
+        budgets.forEach(budget => {
+          const categoria = budget.categoria || 'N/A';
+          const valor = typeof budget.valor === 'number' ? budget.valor : 0;
+          budgetMap[categoria] = valor;
+
+          const budgetElement = document.createElement('div');
+          budgetElement.className = 'alert alert-info';
+          budgetElement.textContent = `${categoria}: R$ ${valor.toFixed(2)}`;
+          budgetOverview.appendChild(budgetElement);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar orçamentos:', error);
       }
     }
 
@@ -208,108 +247,102 @@
       historicoTable.innerHTML = ''; // Limpa a tabela existente
 
       const budgetMap = {};
+      const expenseMap = {};
 
       transactions.forEach(transaction => {
         if (transaction.categoria === 'RENDA') {
-          return; // Ignora transações da categoria RENDA
+          return; 
         }
 
         const categoria = transaction.categoria || 'N/A';
         const valor = typeof transaction.valor === 'number' ? transaction.valor : 0;
 
-        if (!budgetMap[categoria]) {
-          budgetMap[categoria] = { budget: 0, spent: 0 };
+        if (!expenseMap[categoria]) {
+          expenseMap[categoria] = { spent: 0 };
         }
-        budgetMap[categoria].spent += valor;
+        expenseMap[categoria].spent += valor;
 
-        const status = valor <= budgetMap[categoria].budget
-          ? `<span class="badge bg-success">Dentro do orçamento</span>`
-          : `<span class="badge bg-danger">Acima do orçamento</span>`;
-
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-          <td>${new Date(transaction.data).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' })}</td>
-          <td>${categoria}</td>
-          <td>R$ ${budgetMap[categoria].budget.toFixed(2)}</td>
-          <td>R$ ${budgetMap[categoria].spent.toFixed(2)}</td>
-          <td>${status}</td>
-        `;
-        historicoTable.appendChild(newRow);
+       
       });
+
+      updateTableWithBudgetData(budgetMap, expenseMap);
+    }
+
+    async function updateTableWithBudgetData(budgetMap, expenseMap) {
+      const token = localStorage.getItem('authToken');
+      try {
+        const response = await fetch('http://localhost:3000/api/orcamento', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Erro ao carregar orçamentos');
+        }
+        const budgets = await response.json();
+
+        const historicoTable = document.getElementById('historicoTable');
+        budgets.forEach(budget => {
+          const categoria = budget.categoria || 'N/A';
+          const valorOrcado = typeof budget.valor === 'number' ? budget.valor : 0;
+
+          const gastos = expenseMap[categoria] ? expenseMap[categoria].spent : 0;
+          const status = gastos <= valorOrcado ? 'Dentro do Orçamento' : 'Acima do Orçamento';
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${new Date().toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' })}</td>
+            <td>${categoria}</td>
+            <td>R$ ${valorOrcado.toFixed(2)}</td>
+            <td>R$ ${gastos.toFixed(2)}</td>
+            <td>${status}</td>
+          `;
+          historicoTable.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Erro ao atualizar tabela com dados de orçamento:', error);
+      }
     }
 
     function updateCharts(transactions) {
-      const ctxBudgetOverview = document.getElementById('budgetOverviewChart').getContext('2d');
-      const ctxBudgetDetails = document.getElementById('budgetDetailsChart').getContext('2d');
+      const ctx = document.getElementById('budgetDetailsChart').getContext('2d');
 
-      const budgetCategories = {};
-      const budgetData = [];
-
+      const categories = {};
       transactions.forEach(transaction => {
-        if (transaction.categoria === 'RENDA') {
-          return; // Ignora transações da categoria RENDA
-        }
+        if (transaction.categoria === 'RENDA') return;
 
         const categoria = transaction.categoria || 'N/A';
-        if (!budgetCategories[categoria]) {
-          budgetCategories[categoria] = 0;
+        const valor = typeof transaction.valor === 'number' ? transaction.valor : 0;
+
+        if (!categories[categoria]) {
+          categories[categoria] = 0;
         }
-        budgetCategories[categoria] += transaction.valor;
+        categories[categoria] += valor;
       });
 
-      const labels = Object.keys(budgetCategories);
-      const data = Object.values(budgetCategories);
+      const labels = Object.keys(categories);
+      const data = Object.values(categories);
 
-      new Chart(ctxBudgetOverview, {
-        type: 'pie',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56'],
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            tooltip: {
-              callbacks: {
-                label: function(tooltipItem) {
-                  return `${tooltipItem.label}: R$ ${tooltipItem.raw.toFixed(2)}`;
-                }
-              }
-            }
-          }
-        }
-      });
-
-      new Chart(ctxBudgetDetails, {
+      new Chart(ctx, {
         type: 'bar',
         data: {
           labels: labels,
           datasets: [{
-            label: 'Valor Orçado',
+            label: 'Gastos por Categoria',
             data: data,
-            backgroundColor: '#36a2eb',
-            borderColor: '#36a2eb',
-            borderWidth: 1,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
           }]
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: {
-              display: false,
+          scales: {
+            x: {
+              beginAtZero: true
             },
-            tooltip: {
-              callbacks: {
-                label: function(tooltipItem) {
-                  return `${tooltipItem.label}: R$ ${tooltipItem.raw.toFixed(2)}`;
-                }
-              }
+            y: {
+              beginAtZero: true
             }
           }
         }
@@ -317,4 +350,5 @@
     }
   </script>
 </body>
+
 </html>

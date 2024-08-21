@@ -1,28 +1,20 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Função para criar orçamento
 const createOrcamento = async (req, res) => {
     const { categoria, valor } = req.body;
     const usuarioId = req.user.id;
 
-    if (!categoria || !valor) {
+    if (!categoria || valor === undefined) {
         return res.status(400).json({ error: 'Categoria e valor são obrigatórios.' });
     }
 
     try {
-        const categoriaId = await prisma.categoria.findUnique({ where: { nome: categoria } });
-        if (!categoriaId) {
-            return res.status(400).json({ error: 'Categoria inválida.' });
-        }
-
         const orcamento = await prisma.orcamento.create({
             data: {
                 usuarioId,
-                categoriaId: categoriaId.id,
-                valor,
-                dataInicio: new Date(),
-                dataFim: new Date(new Date().setMonth(new Date().getMonth() + 1))
+                categoria: categoria.toUpperCase(),
+                valor
             }
         });
         res.status(201).json(orcamento);
@@ -32,7 +24,7 @@ const createOrcamento = async (req, res) => {
     }
 };
 
-// Função para ler orçamentos
+
 const readOrcamento = async (req, res) => {
     try {
         const orcamentos = await prisma.orcamento.findMany({
@@ -40,41 +32,60 @@ const readOrcamento = async (req, res) => {
         });
         res.json(orcamentos);
     } catch (error) {
-        console.error('Erro ao obter orçamentos:', error);
-        res.status(500).json({ error: 'Erro ao obter orçamentos.' });
+        console.error('Erro ao ler orçamentos:', error);
+        res.status(500).json({ message: 'Erro ao ler orçamentos.' });
     }
 };
 
-// Função para atualizar orçamento
 const updateOrcamento = async (req, res) => {
-    const { id } = req.params;
-    const { categoriaId, valor } = req.body;
+    const { id, categoria, valor } = req.body;
+    const usuarioId = req.user.id;
+
+    if (!id || !categoria || valor === undefined) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    }
+
     try {
         const orcamento = await prisma.orcamento.update({
-            where: { id: parseInt(id, 10) },
+            where: { id },
             data: {
-                categoriaId,
+                categoria: categoria.toUpperCase(),
                 valor
             }
         });
-        return res.status(202).json(orcamento);
+
+        if (orcamento.usuarioId !== usuarioId) {
+            return res.status(403).json({ error: 'Você não tem permissão para atualizar este orçamento.' });
+        }
+
+        res.json(orcamento);
     } catch (error) {
         console.error('Erro ao atualizar orçamento:', error);
         res.status(500).json({ error: 'Erro ao atualizar orçamento.' });
     }
 };
 
-// Função para deletar orçamento
 const deleteOrcamento = async (req, res) => {
     const { id } = req.params;
+    const usuarioId = req.user.id;
+
+    if (!id) {
+        return res.status(400).json({ error: 'ID do orçamento é obrigatório.' });
+    }
+
     try {
-        await prisma.orcamento.delete({
-            where: { id: parseInt(id, 10) }
+        const orcamento = await prisma.orcamento.delete({
+            where: { id }
         });
-        res.status(204).send();
+
+        if (orcamento.usuarioId !== usuarioId) {
+            return res.status(403).json({ error: 'Você não tem permissão para deletar este orçamento.' });
+        }
+
+        res.json({ message: 'Orçamento deletado com sucesso.' });
     } catch (error) {
-        console.error('Erro ao excluir orçamento:', error);
-        res.status(500).json({ error: 'Erro ao excluir orçamento.' });
+        console.error('Erro ao deletar orçamento:', error);
+        res.status(500).json({ error: 'Erro ao deletar orçamento.' });
     }
 };
 

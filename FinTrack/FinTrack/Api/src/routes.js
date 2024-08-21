@@ -35,8 +35,8 @@ router.put('/subcategoria/:id',Middleware.validaAcesso, Subcategoria.updateSubca
 router.delete('/subcategoria/:id',Middleware.validaAcesso, Subcategoria.deleteSubcategoria);
 
 router.post('/orcamento',Middleware.validaAcesso, Orcamento.createOrcamento);
-router.get('/orcamento/:id?',Middleware.validaAcesso, Orcamento.readOrcamento); 
-router.put('/orcamento/:id',Middleware.validaAcesso, Orcamento.updateOrcamento); 
+router.get('/orcamento',Middleware.validaAcesso, Orcamento.readOrcamento); 
+router.put('/orcamento',Middleware.validaAcesso, Orcamento.updateOrcamento); 
 router.delete('/orcamento/:id',Middleware.validaAcesso, Orcamento.deleteOrcamento); 
 
 router.post('/historico-orcamento',Middleware.validaAcesso, HistoricoOrcamento.createHistoricoOrcamento);
