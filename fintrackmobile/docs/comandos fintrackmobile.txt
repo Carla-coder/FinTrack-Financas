@@ -6,11 +6,11 @@ yarn add @react-native-picker/picker
 yarn add @react-navigation/native @react-navigation/stack
 yarn add react-native-gesture-handler react-native-reanimated react-native-screens react-native-safe-area-context @react-native-community/masked-view
 yarn add @react-navigation/bottom-tabs
-yarn add axios
+yarn add axios // verificar se há necessidade de instalação
 yarn add react-native-paper
 yarn add react-native-svg
 yarn add @react-native-async-storage/async-storage
-npm install react-native-chart-kit
+npm install react-native-chart-kit // verficar se há necessidade de instalação
 
 // atualizações recomendadas ( quando fui converter os decimais para centavos)
 yarn add @expo/metro-runtime@~3.2.3
@@ -30,6 +30,8 @@ yarn global add expo-cli // não usar este comando
 -------------------------------------------------------
 
 yarn start --reset-cache
+
+--------------------------------------------------------
 
 npm install @react-navigation/native @react-navigation/drawer @react-navigation/stack react-native-screens react-native-safe-area-context
 
