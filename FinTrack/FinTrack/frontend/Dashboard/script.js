@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Gráfico de fluxo de caixa
         new Chart(cashFlowChartCtx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: data.cashFlow.labels,
                 datasets: [{

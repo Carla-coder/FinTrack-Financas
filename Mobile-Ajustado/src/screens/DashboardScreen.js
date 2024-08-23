@@ -31,7 +31,6 @@ export default function DashboardScreen() {
     setMenuVisible(!menuVisible);
   };
 
-  // Carregar transações salvas
   useEffect(() => {
     const loadTransactions = async () => {
       try {
@@ -47,7 +46,6 @@ export default function DashboardScreen() {
     loadTransactions();
   }, []);
 
-  // Função para calcular o saldo e os gastos
   const calculateBalanceAndExpenses = () => {
     let balance = 0;
     let expenses = 0;
@@ -60,7 +58,7 @@ export default function DashboardScreen() {
       }
     });
 
-    balance -= expenses; // Subtrai as despesas da renda para calcular o saldo
+    balance -= expenses; 
 
     return { balance, expenses };
   };
