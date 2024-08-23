@@ -1,5 +1,4 @@
-# ARRUDA
-## Projeto #01 Website Finance Manager
+# Projeto #01 Website Finance Manager
 
 ## Projeto Fullstack em processo
 
