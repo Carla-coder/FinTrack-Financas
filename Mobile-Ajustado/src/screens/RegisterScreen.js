@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Button,
   StyleSheet,
   Alert,
   Image,
@@ -26,13 +25,11 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      console.log("Registrando:", email, password); // Log para depuração
       await AsyncStorage.setItem("userEmail", email);
       await AsyncStorage.setItem("userPassword", password);
       Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-      navigation.navigate("Login"); // Redireciona para a página de login após o cadastro
+      navigation.navigate("Login");
     } catch (error) {
-      console.error("Erro ao cadastrar:", error); // Log para depuração
       Alert.alert("Erro", "Ocorreu um erro ao cadastrar. Tente novamente.");
     }
   };
@@ -47,57 +44,73 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/logomarca.png")} style={styles.logo} />
-      <Text style={styles.title}>Bem-vindo à Finance Manager</Text>
-      <Text style={styles.welcomeMessage}>
-        Crie sua conta para gerenciar suas finanças de forma fácil e eficiente!
-      </Text>
-      <View style={styles.formGroup}>
-        <Text>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          required
-        />
-      </View>
-      <View style={styles.formGroup}>
-        <Text>Senha</Text>
-        <View style={styles.inputGroup}>
+      <View style={styles.registerContainer}>
+        <View style={styles.logoContainer}>
+          <Image source={require("../assets/logomarca.png")} style={styles.logo} />
+        </View>
+        <Text style={styles.title}>Bem-vindo à FinTrack</Text>
+        <Text style={styles.welcomeMessage}>
+          Cadastre-se para gerenciar suas finanças de forma fácil e eficiente!
+        </Text>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Email:</Text>
           <TextInput
             style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
             required
           />
-          <TouchableOpacity
-            onPress={togglePasswordVisibility}
-            style={styles.inputGroupText}
-          >
-          </TouchableOpacity>
         </View>
-      </View>
-      <View style={styles.formGroup}>
-        <Text>Confirme a Senha</Text>
-        <View style={styles.inputGroup}>
-          <TextInput
-            style={styles.input}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry={!showConfirmPassword}
-            required
-          />
-          <TouchableOpacity
-            onPress={toggleConfirmPasswordVisibility}
-            style={styles.inputGroupText}
-          >
-          </TouchableOpacity>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Senha:</Text>
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              required
+            />
+            <TouchableOpacity
+              onPress={togglePasswordVisibility}
+              style={styles.inputGroupText}
+            >
+              <Icon
+                name={showPassword ? "eye" : "eye-slash"}
+                size={20}
+                color="#7ebab6"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Confirme a Senha:</Text>
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={styles.input}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+              required
+            />
+            <TouchableOpacity
+              onPress={toggleConfirmPasswordVisibility}
+              style={styles.inputGroupText}
+            >
+              <Icon
+                name={showConfirmPassword ? "eye" : "eye-slash"}
+                size={20}
+                color="#7ebab6"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Cadastrar</Text>
+        </TouchableOpacity>
       </View>
-      <Button title="Cadastrar" onPress={handleRegister} color="#007bff" />
     </View>
   );
 };
@@ -108,27 +121,43 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f4f4f4",
-    padding: 20,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
   },
   logo: {
-    width: 250,
-    height: 250,
-    marginBottom: 20,
+    width: 130,
+    height: 130,
+  },
+  registerContainer: {
+    width: "90%",
+    maxWidth: 400,
+    backgroundColor: "#ffffff",
+    padding: 20,
+    borderRadius: 10,
+    borderColor: "#c2be99",
+    borderWidth: 1,
+    elevation: 5,
   },
   title: {
-    fontSize: 24,
     marginBottom: 20,
+    fontSize: 24,
+    fontWeight: "bold",
     textAlign: "center",
+    color: "#284767",
   },
   welcomeMessage: {
-    fontSize: 16,
-    textAlign: "center",
     marginBottom: 20,
-    color: "#333",
+    textAlign: "center",
+    fontSize: 18,
+    color: "#376f7b",
   },
   formGroup: {
-    width: "100%",
     marginBottom: 15,
+  },
+  label: {
+    color: "#284767",
   },
   input: {
     width: "100%",
@@ -145,6 +174,18 @@ const styles = StyleSheet.create({
   },
   inputGroupText: {
     marginLeft: 10,
+  },
+  button: {
+    backgroundColor: "#7ebab6",
+    padding: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+    fontSize: 17,
   },
 });
 

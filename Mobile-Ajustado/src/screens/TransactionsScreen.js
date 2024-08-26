@@ -7,6 +7,7 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -143,45 +144,55 @@ export default function TransactionsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.transactionsContainer}>
-        <Text style={styles.transactionsTitle}>Novas Transações:</Text>
-        <View style={styles.transactionHeader}>
-          <Text style={styles.transactionHeaderText}>Data</Text>
-          <Text style={styles.transactionHeaderText}>Descrição</Text>
-          <Text style={styles.transactionHeaderText}>Categoria</Text>
-          <Text style={styles.transactionHeaderText}>Tipo</Text>
-          <Text style={styles.transactionHeaderText}>Valor</Text>
-          <Text style={styles.transactionHeaderText}>Ação</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.transactionsContainer}>
+          <Text style={styles.transactionsTitle}>Novas Transações:</Text>
+          <View style={styles.transactionHeader}>
+            <Text style={styles.transactionHeaderText}>Data</Text>
+            <Text style={styles.transactionHeaderText}>Descrição</Text>
+            <Text style={styles.transactionHeaderText}>Categoria</Text>
+            <Text style={styles.transactionHeaderText}>Valor</Text>
+            <Text style={styles.transactionHeaderText}>Ação</Text>
+          </View>
+          <FlatList
+            data={transactions}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.transactionItem}>
+                <Text style={styles.transactionDetail}>{item.date}</Text>
+                <Text style={styles.transactionDetail}>{item.description}</Text>
+                <Text style={styles.transactionDetail}>{item.category}</Text>
+                <Text
+                  style={[
+                    styles.transactionAmount,
+                    { color: item.type === "renda" ? "#7ebab6" : "#376f7b" },
+                  ]}
+                >
+                  {item.type === "renda"
+                    ? `+ R$ ${item.amount.toFixed(2)}`
+                    : `- R$ ${item.amount.toFixed(2)}`}
+                </Text>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => handleEditTransaction(item)}
+                >
+                  <Text style={styles.editButtonText}>✎</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
         </View>
-        <FlatList
-          data={transactions}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.transactionItem}>
-              <Text style={styles.transactionDetail}>{item.date}</Text>
-              <Text style={styles.transactionDetail}>{item.description}</Text>
-              <Text style={styles.transactionDetail}>{item.category}</Text>
-              <Text style={styles.transactionDetail}>{item.type}</Text>
-              <Text
-                style={[
-                  styles.transactionAmount,
-                  { color: item.type === "renda" ? "blue" : "red" },
-                ]}
-              >
-                {item.type === "renda"
-                  ? `+ R$ ${item.amount.toFixed(2)}`
-                  : `- R$ ${item.amount.toFixed(2)}`}
-              </Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => handleEditTransaction(item)}
-              >
-                <Text style={styles.editButtonText}>Editar</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        />
-      </View>
+      </ScrollView>
+
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => {
+          setEditMode(false);
+          setModalVisible(true);
+        }}
+      >
+        <Text style={styles.addButtonText}>+</Text>
+      </TouchableOpacity>
 
       <Modal
         animationType="slide"
@@ -234,10 +245,7 @@ export default function TransactionsScreen() {
               <Picker.Item label="Viagens" value="Viagens" />
               <Picker.Item label="Eventos" value="Eventos" />
               <Picker.Item label="Presentes" value="Presentes" />
-              <Picker.Item
-                label="Cuidados Pessoais"
-                value="Cuidados Pessoais"
-              />
+              <Picker.Item label="Cuidados Pessoais" value="Cuidados Pessoais" />
               <Picker.Item label="Assinaturas" value="Assinaturas" />
               <Picker.Item label="Impostos" value="Impostos" />
               <Picker.Item label="Seguros" value="Seguros" />
@@ -268,29 +276,30 @@ export default function TransactionsScreen() {
               }
             >
               <Text style={styles.saveButtonText}>
-                {editMode ? "Atualizar" : "Salvar"}
+                {editMode ? "Atualizar" : "Adicionar"}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flex: 1,
+    backgroundColor: "#f4f4f4",
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
   transactionsContainer: {
-    marginBottom: 20,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    margin: 10,
+    padding: 10,
+    elevation: 2,
   },
   transactionsTitle: {
     fontSize: 18,
@@ -299,127 +308,108 @@ const styles = StyleSheet.create({
   },
   transactionHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    paddingBottom: 5,
-    marginBottom: 10,
+    borderBottomColor: "#ccc",
+    backgroundColor: "#f1f1f1",
   },
   transactionHeaderText: {
-    fontWeight: "bold",
     flex: 1,
     textAlign: "center",
+    fontWeight: "bold",
   },
   transactionItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
   transactionDetail: {
     flex: 1,
     textAlign: "center",
   },
   transactionAmount: {
-    fontSize: 16,
     flex: 1,
     textAlign: "center",
+    fontWeight: "bold",
   },
   editButton: {
-    backgroundColor: "#ffcc00",
-    padding: 5,
-    borderRadius: 5,
-    marginLeft: 10,
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
   },
   editButtonText: {
+    fontSize: 18,
+    color: "#007bff",
+  },
+  addButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#007bff",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+  },
+  addButtonText: {
+    fontSize: 30,
     color: "#fff",
-    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
+    width: "90%",
     backgroundColor: "#fff",
+    borderRadius: 10,
     padding: 20,
-    borderRadius: 8,
-    width: "80%",
     elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
   },
   closeButton: {
-    backgroundColor: "#8ccaef",
+    backgroundColor: "#ff5c5c",
+    borderRadius: 20,
     padding: 5,
-    borderRadius: 5,
   },
   closeButtonText: {
     color: "#fff",
     fontWeight: "bold",
   },
   input: {
-    backgroundColor: "#f4f4f4",
-    borderWidth: 1,
-    borderColor: "#ddd",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    marginBottom: 15,
     padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
   },
   picker: {
-    backgroundColor: "#f4f4f4",
     borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
+    borderColor: "#ccc",
     borderRadius: 5,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   saveButton: {
-    backgroundColor: "#8ccaef",
+    backgroundColor: "#007bff",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
   },
   saveButtonText: {
     color: "#fff",
-    fontWeight: "bold",
-  },
-  fab: {
-    backgroundColor: "#8ccaef",
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 30,
-    right: 30,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  fabText: {
-    color: "#fff",
-    fontSize: 24,
     fontWeight: "bold",
   },
 });
