@@ -13,7 +13,6 @@ import { Ionicons } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Função para configurar o Tab Navigator
 function AppTabs() {
   return (
     <Tab.Navigator
@@ -43,7 +42,6 @@ function AppTabs() {
   );
 }
 
-// Função principal do App
 export default function App() {
   return (
     <NavigationContainer>

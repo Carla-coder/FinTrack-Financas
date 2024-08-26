@@ -16,12 +16,12 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      console.log("Tentando login:", email, password); // Log para depuração
+      console.log("Tentando login:", email, password); 
       const storedEmail = await AsyncStorage.getItem("userEmail");
       const storedPassword = await AsyncStorage.getItem("userPassword");
 
-      console.log("Email armazenado:", storedEmail); // Log para depuração
-      console.log("Senha armazenada:", storedPassword); // Log para depuração
+      console.log("Email armazenado:", storedEmail); 
+      console.log("Senha armazenada:", storedPassword); 
 
       if (!storedEmail || !storedPassword) {
         Alert.alert("Erro", "Você precisa se cadastrar primeiro!");
@@ -30,23 +30,28 @@ const LoginScreen = ({ navigation }) => {
 
       if (email === storedEmail && password === storedPassword) {
         Alert.alert("Sucesso", "Login realizado com sucesso!");
-        navigation.navigate("AppTabs"); // Navega para AppTabs após o login bem-sucedido
+        navigation.navigate("AppTabs"); 
       } else {
         Alert.alert("Erro", "Email ou senha incorretos!");
       }
     } catch (error) {
-      console.error("Erro ao fazer login:", error); // Log para depuração
+      console.error("Erro ao fazer login:", error); 
       Alert.alert("Erro", "Ocorreu um erro ao fazer login.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/logomarca.png")} style={styles.logo} />
       <View style={styles.loginContainer}>
-        <Text style={styles.title}>Login</Text>
+        <View style={styles.logoContainer}>
+          <Image source={require("../assets/logomarca.png")} style={styles.logo} />
+        </View>
+        <Text style={styles.title}>Faça seu login</Text>
+        <Text style={styles.welcomeMessage}>
+          Entre e gerencie suas finanças de forma fácil e eficiente!
+        </Text>
         <View style={styles.formGroup}>
-          <Text>Email</Text>
+          <Text style={styles.label}>Email:</Text>
           <TextInput
             style={styles.input}
             placeholder="Digite seu email"
@@ -57,7 +62,7 @@ const LoginScreen = ({ navigation }) => {
           />
         </View>
         <View style={styles.formGroup}>
-          <Text>Senha</Text>
+          <Text style={styles.label}>Senha:</Text>
           <TextInput
             style={styles.input}
             placeholder="Digite sua senha"
@@ -69,8 +74,6 @@ const LoginScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
-
-        {/* Botão para navegar para a tela de cadastro */}
         <TouchableOpacity
           style={styles.registerButton}
           onPress={() => navigation.navigate("Cadastro")}
@@ -91,17 +94,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f4f4f4",
   },
-  logo: {
-    width: 250,
-    height: 250,
+  logoContainer: {
+    alignItems: "center",
     marginBottom: 20,
+  },
+  logo: {
+    width: 130, 
+    height: 130,
   },
   loginContainer: {
     width: "90%",
     maxWidth: 400,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     padding: 20,
     borderRadius: 10,
+    borderColor: "#c2be99", 
+    borderWidth: 1,
     elevation: 5,
   },
   title: {
@@ -109,34 +117,48 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#284767", 
+  },
+  welcomeMessage: {
+    marginBottom: 20,
+    textAlign: "center",
+    fontSize: 18,
+    color: "#376f7b", 
   },
   formGroup: {
     marginBottom: 15,
   },
+  label: {
+    color: "#284767",
+  },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#ceceb1",
     borderRadius: 5,
     padding: 10,
     marginTop: 5,
+    backgroundColor: "#f4f4f4",
   },
   button: {
-    backgroundColor: "#8ccaef",
+    backgroundColor: "#7ebab6",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
+    marginTop: 20,
   },
   buttonText: {
-    color: "#fff",
+    color: "#ffffff",
     fontWeight: "bold",
+    fontSize: 17, 
   },
   registerButton: {
     marginTop: 20,
     alignItems: "center",
   },
   registerButtonText: {
-    color: "#474fa2",
-    textDecorationLine: "underline",
+    color: "#7ebab6",
+    fontSize: 12,
+    fontWeight: "bold", 
   },
 });
 

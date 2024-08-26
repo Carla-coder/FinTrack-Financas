@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCharts(transacoes, orcamentos, reportType);
         updateSummary(transacoes, orcamentos);
   
-        // Mostra os gráficos e resumo financeiro
         chartsContainer.classList.remove('d-none');
         summaryCard.classList.remove('d-none');
       } catch (error) {
@@ -56,12 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   
     function updateCharts(transacoes, orcamentos, reportType) {
-      // Oculta todos os gráficos
       document.querySelectorAll('#chartsContainer .col-md-6').forEach(chart => {
         chart.classList.add('d-none');
       });
   
-      // Inicializa gráficos com base no tipo de relatório selecionado
       switch (reportType) {
         case 'income-expense':
           document.getElementById('incomeExpenseChartContainer').classList.remove('d-none');
@@ -158,25 +155,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   
     function createSavingsTrendChart(transacoes) {
-        // Formata as datas para exibir apenas o dia e o mês
         const formatDate = (dateString) => {
           const date = new Date(dateString);
           const day = String(date.getDate()).padStart(2, '0');
-          const month = String(date.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+          const month = String(date.getMonth() + 1).padStart(2, '0'); 
           return `${day}/${month}`;
         };
       
-        const savingsData = transacoes.map(t => t.valor); // Placeholder
-        const dates = transacoes.map(t => formatDate(t.data)); // Formata datas
+        const savingsData = transacoes.map(t => t.valor);
+        const dates = transacoes.map(t => formatDate(t.data));
       
         new Chart(document.getElementById('savingsTrendChart'), {
           type: 'line',
           data: {
-            labels: dates, // Usa datas formatadas
+            labels: dates, 
             datasets: [
               {
                 label: 'Tendência de Economia',
-                data: savingsData, // Placeholder
+                data: savingsData, 
                 borderColor: '#8BC34A',
                 backgroundColor: '#8BC34A',
                 fill: false,
