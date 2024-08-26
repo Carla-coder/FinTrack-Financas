@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            usuarioId: 1, // Ajuste conforme necessário
+            usuarioId: 1, 
             categoria: category,
             valor: amount
           })
@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (response.ok) {
           loadTransactionData();
-          // Fechar o modal após adicionar o orçamento
           const addBudgetModal = bootstrap.Modal.getInstance(document.getElementById('addBudgetModal'));
           addBudgetModal.hide();
         } else {
@@ -88,7 +87,6 @@ document.addEventListener('DOMContentLoaded', function () {
         budgetOverview.appendChild(budgetElement);
       });
 
-      // Atualiza o gráfico após carregar os orçamentos
       updateCharts(transactions);
     } catch (error) {
       console.error('Erro ao carregar orçamentos:', error);
@@ -97,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function renderTransactions(transactions) {
     const historicoTable = document.getElementById('historicoTable');
-    historicoTable.innerHTML = ''; // Limpa a tabela existente
+    historicoTable.innerHTML = ''; 
 
     const budgetMap = {};
     const expenseMap = {};
@@ -140,7 +138,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const gastos = expenseMap[categoria] ? expenseMap[categoria].spent : 0;
         const status = gastos <= valorOrcado ? 'Dentro do Orçamento' : 'Acima do Orçamento';
 
-        // Adiciona classes de cor
         const statusClass = gastos <= valorOrcado ? 'text-success' : 'text-danger';
 
         const row = document.createElement('tr');
@@ -188,18 +185,8 @@ document.addEventListener('DOMContentLoaded', function () {
         datasets: [{
           label: 'Gastos por Categoria',
           data: data,
-          backgroundColor: [
-            'rgba(0, 123, 255, 0.7)',   // Azul vibrante
-            'rgba(255, 193, 7, 0.7)',   // Amarelo vibrante
-            'rgba(220, 53, 69, 0.7)',   // Vermelho vibrante
-            'rgba(40, 167, 69, 0.7)'    // Verde vibrante
-          ],
-          borderColor: [
-            'rgba(0, 123, 255, 1)',     // Azul
-            'rgba(255, 193, 7, 1)',     // Amarelo
-            'rgba(220, 53, 69, 1)',     // Vermelho
-            'rgba(40, 167, 69, 1)'      // Verde
-          ],
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+          borderColor: '#ffffff',
           borderWidth: 2
         }]
       },

@@ -2,16 +2,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('authToken');
 
     if (!token) {
-        // Redirecionar para a página de login se não estiver autenticado
         window.location.href = '/login.html';
     } else {
-        // Carregar dados iniciais
         loadTransactionData();
 
-        // Configurar eventos para salvar e editar transações
         document.getElementById('saveTransactionButton').addEventListener('click', async function () {
             const transactionData = {
-                usuarioId: 1, // Ajuste conforme necessário, idealmente obtido do token
+                usuarioId: 1, 
                 data: document.getElementById('transactionDate').value,
                 descricao: document.getElementById('transactionDescription').value,
                 categoria: document.getElementById('transactionCategory').value.toUpperCase(),
@@ -31,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Função para carregar transações
 async function loadTransactionData() {
     const token = localStorage.getItem('authToken');
 
@@ -51,18 +47,25 @@ async function loadTransactionData() {
     }
 }
 
-// Função para renderizar transações
 function renderTransactions(transactions) {
     const tableBody = document.getElementById('transactionTableBody');
     tableBody.innerHTML = '';
 
     transactions.forEach(transaction => {
         const row = document.createElement('tr');
+        let formattedValue = transaction.valor.toFixed(2);
+
+        if (transaction.categoria.toUpperCase() === "RENDA") {
+            formattedValue = `<span class="text-success">+ ${formattedValue}</span>`;
+        } else {
+            formattedValue = `<span class="text-danger">- ${formattedValue}</span>`;
+        }
+
         row.innerHTML = `
             <td>${formatDate(transaction.data)}</td>
             <td>${transaction.descricao}</td>
             <td>${transaction.categoria}</td>
-            <td>${transaction.valor.toFixed(2)}</td>
+            <td>${formattedValue}</td>
             <td>
                 <button class="btn btn-warning btn-sm" onclick="editTransaction(${transaction.id})">Editar</button>
             </td>
@@ -71,16 +74,14 @@ function renderTransactions(transactions) {
     });
 }
 
-// Função para formatar data
 function formatDate(dateString) {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    return `${day}/${month}/${year}`; // Retorna a data no formato DD/MM/YYYY
+    return `${day}/${month}/${year}`; 
 }
 
-// Função para adicionar uma nova transação
 async function saveTransaction(transactionData) {
     const token = localStorage.getItem('authToken');
 
@@ -105,7 +106,6 @@ async function saveTransaction(transactionData) {
     }
 }
 
-// Função para editar uma transação
 function editTransaction(id) {
     const token = localStorage.getItem('authToken');
 
@@ -128,7 +128,6 @@ function editTransaction(id) {
         .catch(error => console.error('Erro ao carregar transação:', error));
 }
 
-// Função para atualizar uma transação
 async function updateTransaction(id, transactionData) {
     const token = localStorage.getItem('authToken');
 

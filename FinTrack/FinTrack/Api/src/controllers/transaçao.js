@@ -1,6 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const validCategorias = ['RENDA', 'ALIMENTACAO', 'TRANSPORTE', 'UTILIDADES', 'ENTRETENIMENTO'];
+
 const createTransacao = async (req, res) => {
     const { data, descricao, categoria, valor, tags } = req.body;
     const usuarioId = req.user.id; // Obtém o ID do usuário autenticado
@@ -9,13 +11,14 @@ const createTransacao = async (req, res) => {
         return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
     }
 
-    try {
-        // Validar categoria
-        const validCategorias = ['RENDA', 'ALIMENTACAO', 'TRANSPORTE', 'UTILIDADES', 'ENTRETENIMENTO'];
-        if (!validCategorias.includes(categoria)) {
-            return res.status(400).json({ message: 'Categoria inválida.' });
-        }
+    // Converter a categoria para maiúsculas
+    const normalizedCategoria = categoria.toUpperCase();
 
+    if (!validCategorias.includes(normalizedCategoria)) {
+        return res.status(400).json({ message: 'Categoria inválida.' });
+    }
+
+    try {
         // Criar transação
         const transacao = await prisma.transacao.create({
             data: {
@@ -24,7 +27,7 @@ const createTransacao = async (req, res) => {
                 },
                 data: new Date(data),
                 descricao,
-                categoria,
+                categoria: normalizedCategoria,
                 valor,
                 tags
             }
@@ -61,6 +64,14 @@ const readTransacao = async (req, res) => {
 const updateTransacao = async (req, res) => {
     try {
         const { id } = req.params;
+        const { categoria } = req.body;
+
+        // Converter a categoria para maiúsculas se fornecida
+        if (categoria) {
+            const normalizedCategoria = categoria.toUpperCase();
+            req.body.categoria = normalizedCategoria;
+        }
+
         const transacao = await prisma.transacao.findFirst({
             where: { id: parseInt(id, 10), usuarioId: req.user.id }
         });
