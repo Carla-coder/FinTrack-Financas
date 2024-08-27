@@ -217,7 +217,7 @@ export default function DashboardScreen({ navigation }) {
                 backgroundColor: "#fff",
                 backgroundGradientFrom: "#fff",
                 backgroundGradientTo: "#fff",
-                decimalPlaces: 1,
+                decimalPlaces: 2,
                 color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               }}
               accessor="amount"

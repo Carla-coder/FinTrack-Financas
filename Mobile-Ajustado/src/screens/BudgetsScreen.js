@@ -11,7 +11,10 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LineChart } from "react-native-chart-kit";
+import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js";
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 export default function BudgetScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,7 +26,11 @@ export default function BudgetScreen() {
     labels: [],
     datasets: [
       {
+        label: 'Gastos por Categoria',
         data: [],
+        backgroundColor: 'rgba(72, 138, 201, 0.6)',
+        borderColor: 'rgba(72, 138, 201, 1)',
+        borderWidth: 1,
       },
     ],
   });
@@ -48,7 +55,6 @@ export default function BudgetScreen() {
   }, []);
 
   useEffect(() => {
-    // Calculate data for the chart
     const labels = [];
     const chartData = [];
 
@@ -58,12 +64,20 @@ export default function BudgetScreen() {
         .reduce((acc, transaction) => acc + transaction.amount, 0);
 
       labels.push(budget.category);
-      chartData.push(budget.budgetAmount);
+      chartData.push(spentAmount);
     });
 
     setData({
       labels,
-      datasets: [{ data: chartData }],
+      datasets: [
+        {
+          label: 'Gastos por Categoria',
+          data: chartData,
+          backgroundColor: 'rgba(72, 138, 201, 0.6)',
+          borderColor: 'rgba(72, 138, 201, 1)',
+          borderWidth: 1,
+        },
+      ],
     });
   }, [budgets, transactions]);
 
@@ -96,21 +110,38 @@ export default function BudgetScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.chartContainer}>
-          <LineChart
+        <Bar
             data={data}
-            width={Dimensions.get("window").width - 30}
-            height={220}
-            yAxisLabel="R$ "
-            chartConfig={{
-              backgroundColor: "#fff",
-              backgroundGradientFrom: "#fff",
-              backgroundGradientTo: "#fff",
-              decimalPlaces: 2,
-              color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-              style: {
-                borderRadius: 16,
+            width={Dimensions.get("window").width - 30} // Largura do gráfico
+            height={250} // Altura do gráfico
+            options={{
+              indexAxis: 'y', // Configura o gráfico como horizontal
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(tooltipItem) {
+                      return `R$ ${tooltipItem.raw.toFixed(2)}`;
+                    }
+                  }
+                }
               },
+              scales: {
+                x: {
+                  beginAtZero: true,
+                  ticks: {
+                    callback: function(value) {
+                      return `R$ ${value}`;
+                    }
+                  }
+                },
+                y: {
+                  beginAtZero: true,
+                }
+              }
             }}
             style={styles.chart}
           />
@@ -245,6 +276,7 @@ const styles = StyleSheet.create({
   chart: {
     marginVertical: 8,
     borderRadius: 16,
+    marginHorizontal: 10,
   },
   budgetsContainer: {
     backgroundColor: "#fff",
@@ -253,6 +285,7 @@ const styles = StyleSheet.create({
     borderColor: "#d4af37",
     margin: 10,
     padding: 10,
+    elevation: 2,
   },
   budgetsTitle: {
     fontSize: 18,
@@ -265,15 +298,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#d4af37",
-    padding: 10,
+    padding: 15,
     marginBottom: 10,
-    elevation: 2,
     position: "relative",
   },
   budgetCategory: {
+    fontSize: 18,
     fontWeight: "bold",
-    fontSize: 16,
-    color: "#376f7b",
+    color: "#284767",
   },
   budgetDetails: {
     fontSize: 16,
@@ -288,61 +320,63 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: "#d4af37",
-    borderRadius: 15,
     padding: 5,
+    backgroundColor: "#7ebab6",
+    borderRadius: 10,
   },
   editButtonText: {
     color: "#fff",
-    fontSize: 16,
+    fontWeight: "bold",
   },
   addButton: {
-    backgroundColor: "#d4af37",
-    borderRadius: 50,
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#7ebab6",
     width: 60,
     height: 60,
-    alignItems: "center",
+    borderRadius: 30,
     justifyContent: "center",
-    position: "absolute",
-    bottom: 30,
-    right: 30,
+    alignItems: "center",
     elevation: 5,
   },
   addButtonText: {
     color: "#fff",
     fontSize: 30,
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
+    width: 300,
     backgroundColor: "#fff",
     borderRadius: 10,
-    width: "90%",
     padding: 20,
+    elevation: 5,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#376f7b",
+    color: "#284767",
   },
   closeButton: {
-    backgroundColor: "#d4af37",
-    borderRadius: 20,
+    backgroundColor: "#7ebab6",
+    borderRadius: 10,
     padding: 5,
   },
   closeButtonText: {
-    fontSize: 16,
     color: "#fff",
+    fontWeight: "bold",
   },
   picker: {
     height: 50,
@@ -350,20 +384,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#d4af37",
+    borderWidth: 1,
+    borderColor: "#7ebab6",
+    borderRadius: 5,
+    padding: 10,
     marginBottom: 10,
-    padding: 5,
+    color: "#284767",
   },
   saveButton: {
-    backgroundColor: "#376f7b",
-    padding: 10,
+    backgroundColor: "#7ebab6",
     borderRadius: 5,
+    padding: 10,
     alignItems: "center",
   },
   saveButtonText: {
     color: "#fff",
-    fontSize: 16,
     fontWeight: "bold",
   },
 });
