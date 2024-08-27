@@ -9,10 +9,9 @@ import {
   Dimensions,
 } from "react-native";
 import { LineChart, PieChart } from "react-native-chart-kit";
-import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function DashboardScreen() {
+export default function DashboardScreen({ navigation }) {
   const [transactions, setTransactions] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
   const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
@@ -21,18 +20,18 @@ export default function DashboardScreen() {
     setMenuVisible(!menuVisible);
   };
 
-  useEffect(() => {
-    const loadTransactions = async () => {
-      try {
-        const savedTransactions = await AsyncStorage.getItem("transactions");
-        if (savedTransactions !== null) {
-          setTransactions(JSON.parse(savedTransactions));
-        }
-      } catch (error) {
-        console.error("Erro ao carregar transações:", error);
+  const loadTransactions = async () => {
+    try {
+      const savedTransactions = await AsyncStorage.getItem("transactions");
+      if (savedTransactions !== null) {
+        setTransactions(JSON.parse(savedTransactions));
       }
-    };
+    } catch (error) {
+      console.error("Erro ao carregar transações:", error);
+    }
+  };
 
+  useEffect(() => {
     loadTransactions();
   }, []);
 
@@ -47,6 +46,14 @@ export default function DashboardScreen() {
       Dimensions.removeEventListener("change", updateLayout);
     };
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadTransactions();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const calculateBalanceAndExpenses = () => {
     let balance = 0;
@@ -132,7 +139,7 @@ export default function DashboardScreen() {
       color: colors[index % colors.length],
       legendFontColor: "#284767",
       legendFontSize: 12,
-      label: `R$ ${categoryTotals[category].toFixed(2)}`, // Adiciona "R$" na frente do valor
+      label: `R$ ${categoryTotals[category].toFixed(2)}`,
     }));
   };
 
@@ -186,7 +193,7 @@ export default function DashboardScreen() {
           <LineChart
             data={prepareLineChartData()}
             width={screenWidth > 500 ? (screenWidth - 60) / 2 : screenWidth - 60}
-            height={100}
+            height={160}
             chartConfig={{
               backgroundColor: "#fff",
               backgroundGradientFrom: "#fff",
@@ -205,7 +212,7 @@ export default function DashboardScreen() {
             <PieChart
               data={preparePieChartData()}
               width={screenWidth > 500 ? (screenWidth - 60) / 2 : screenWidth - 60}
-              height={120}
+              height={140}
               chartConfig={{
                 backgroundColor: "#fff",
                 backgroundGradientFrom: "#fff",
@@ -215,7 +222,7 @@ export default function DashboardScreen() {
               }}
               accessor="amount"
               backgroundColor="transparent"
-              paddingLeft="15"
+              paddingLeft="5"
               style={styles.chart}
               absolute
             />
@@ -224,19 +231,19 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.transactionsContainer}>
-        <Text style={styles.transactionsTitle}>Últimas Transações:</Text>
-        <View style={styles.transactionHeader}>
-          <Text style={styles.transactionHeaderText}>Data</Text>
-          <Text style={styles.transactionHeaderText}>Descrição</Text>
-          <Text style={styles.transactionHeaderText}>Valor</Text>
-        </View>
-        <FlatList
-          data={transactions.slice(-2)}
-          renderItem={renderTransactionItem}
-          keyExtractor={(item) => item.id.toString()}
-        />
+      <Text style={styles.transactionsTitle}>Últimas Transações:</Text>
+      <View style={styles.transactionHeader}>
+        <Text style={styles.transactionHeaderText}>Data</Text>
+        <Text style={styles.transactionHeaderText}>Descrição</Text>
+        <Text style={styles.transactionHeaderText}>Valor</Text>
       </View>
-    </ScrollView>
+      <FlatList
+        data={transactions.filter(transaction => transaction.type === "despesa").slice(-3)}
+        renderItem={renderTransactionItem}
+        keyExtractor={(item) => item.id.toString()}
+      />
+    </View>
+  </ScrollView>
   );
 }
 
@@ -277,7 +284,7 @@ const styles = StyleSheet.create({
     width: "48%",
     alignItems: "center",
     elevation: 3,
-    borderColor: "#d4af37", // Borda dourada
+    borderColor: "#d4af37", 
     borderWidth: 1,
   },
   title: {
@@ -299,7 +306,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     elevation: 3,
-    borderColor: "#d4af37", // Borda dourada
+    borderColor: "#d4af37",
     borderWidth: 1,
     marginBottom: 5,
   },
@@ -319,7 +326,7 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 3,
     marginTop: 5,
-    borderColor: "#d4af37", // Borda dourada
+    borderColor: "#d4af37",
     borderWidth: 1,
   },
   transactionsTitle: {

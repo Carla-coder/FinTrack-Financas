@@ -1,195 +1,369 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
-  Button,
   Modal,
-  TextInput,
   TouchableOpacity,
-  Alert,
+  TextInput,
+  ScrollView,
+  Dimensions,
 } from "react-native";
-import { ProgressBar, Colors } from "react-native-paper";
-import { PieChart } from "react-native-chart-kit";
+import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LineChart } from "react-native-chart-kit";
 
-export default function BudgetsScreen() {
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [category, setCategory] = React.useState("");
-  const [amount, setAmount] = React.useState("");
-  const [budgets, setBudgets] = React.useState({
-    Alimentação: { budget: 1000, spent: 700 },
-    Transporte: { budget: 500, spent: 425 },
-    Entretenimento: { budget: 300, spent: 330 },
-    Utilidades: { budget: 500, spent: 250 },
+export default function BudgetScreen() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [category, setCategory] = useState("");
+  const [budgetAmount, setBudgetAmount] = useState("");
+  const [budgets, setBudgets] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [data, setData] = useState({
+    labels: [],
+    datasets: [
+      {
+        data: [],
+      },
+    ],
   });
 
-  const handleAddBudget = () => {
-    if (category && !isNaN(amount)) {
-      const updatedBudgets = { ...budgets };
-      updatedBudgets[category].spent += parseFloat(amount);
+  useEffect(() => {
+    const loadBudgetsAndTransactions = async () => {
+      try {
+        const savedBudgets = await AsyncStorage.getItem("budgets");
+        if (savedBudgets !== null) {
+          setBudgets(JSON.parse(savedBudgets));
+        }
+        const savedTransactions = await AsyncStorage.getItem("transactions");
+        if (savedTransactions !== null) {
+          setTransactions(JSON.parse(savedTransactions));
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+      }
+    };
+
+    loadBudgetsAndTransactions();
+  }, []);
+
+  useEffect(() => {
+    // Calculate data for the chart
+    const labels = [];
+    const chartData = [];
+
+    budgets.forEach((budget) => {
+      const spentAmount = transactions
+        .filter((transaction) => transaction.category === budget.category)
+        .reduce((acc, transaction) => acc + transaction.amount, 0);
+
+      labels.push(budget.category);
+      chartData.push(budget.budgetAmount);
+    });
+
+    setData({
+      labels,
+      datasets: [{ data: chartData }],
+    });
+  }, [budgets, transactions]);
+
+  const handleAddBudget = async () => {
+    if (category && budgetAmount) {
+      const newBudget = {
+        id: budgets.length + 1,
+        category,
+        budgetAmount: parseFloat(budgetAmount),
+      };
+
+      const updatedBudgets = [...budgets, newBudget];
       setBudgets(updatedBudgets);
+
+      try {
+        await AsyncStorage.setItem("budgets", JSON.stringify(updatedBudgets));
+      } catch (error) {
+        console.error("Erro ao salvar orçamentos:", error);
+      }
+
+      setCategory("");
+      setBudgetAmount("");
       setModalVisible(false);
     } else {
-      Alert.alert("Erro", "Por favor, preencha todos os campos corretamente.");
+      alert("Por favor, preencha todos os campos.");
     }
   };
 
-  if (category && !isNaN(amount)) {
-    const updatedBudgets = { ...budgets };
-    if (!updatedBudgets[category]) {
-      updatedBudgets[category] = { budget: 0, spent: 0 };
-    }
-    updatedBudgets[category].spent += parseFloat(amount);
-    setBudgets(updatedBudgets);
-    setModalVisible(false);
-  }
-
-  const chartData = Object.keys(budgets).map((key) => ({
-    name: key,
-    amount: budgets[key].budget,
-    color:
-      key === "Alimentação"
-        ? Colors.green700
-        : key === "Transporte"
-        ? Colors.yellow700
-        : key === "Entretenimento"
-        ? Colors.red700
-        : Colors.blue700,
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15,
-  }));
-
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Orçamentos</Text>
-
-      {Object.keys(budgets).map((key) => (
-        <View key={key} style={styles.card}>
-          <Text style={styles.cardTitle}>{key}</Text>
-          <ProgressBar
-            progress={budgets[key].spent / budgets[key].budget}
-            color={chartData.find((data) => data.name === key).color}
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.chartContainer}>
+          <LineChart
+            data={data}
+            width={Dimensions.get("window").width - 30}
+            height={220}
+            yAxisLabel="R$ "
+            chartConfig={{
+              backgroundColor: "#fff",
+              backgroundGradientFrom: "#fff",
+              backgroundGradientTo: "#fff",
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+            }}
+            style={styles.chart}
           />
-          <Text>{`R$ ${budgets[key].spent.toFixed(2)} / R$ ${budgets[
-            key
-          ].budget.toFixed(2)}`}</Text>
         </View>
-      ))}
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Visão Geral</Text>
-        <PieChart
-          data={chartData}
-          width={300}
-          height={220}
-          chartConfig={{
-            backgroundColor: "#f4f4f4",
-            backgroundGradientFrom: "#f4f4f4",
-            backgroundGradientTo: "#f4f4f4",
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-          }}
-          accessor={"amount"}
-          backgroundColor={"transparent"}
-          paddingLeft={"15"}
-        />
-      </View>
+        <View style={styles.budgetsContainer}>
+          <Text style={styles.budgetsTitle}>Orçamentos:</Text>
+          {budgets.map((item) => {
+            const spentAmount = transactions
+              .filter((transaction) => transaction.category === item.category)
+              .reduce((acc, transaction) => acc + transaction.amount, 0);
+            const isExceeded = spentAmount > item.budgetAmount;
+
+            return (
+              <View key={item.id} style={styles.budgetCard}>
+                <Text style={styles.budgetCategory}>{item.category}</Text>
+                <Text style={styles.budgetDetails}>
+                  Valor Orçado: R$ {item.budgetAmount.toFixed(2)}
+                </Text>
+                <Text style={styles.budgetDetails}>
+                  Valor Gasto: R$ {spentAmount.toFixed(2)}
+                </Text>
+                <Text
+                  style={[
+                    styles.budgetStatus,
+                    { color: isExceeded ? "#df4822" : "#2aad40" },
+                  ]}
+                >
+                  {isExceeded ? "Excedido" : "Dentro do Orçamento"}
+                </Text>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => {
+                    setCategory(item.category);
+                    setBudgetAmount(item.budgetAmount.toString());
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.editButtonText}>✎</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
 
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => setModalVisible(true)}
+        onPress={() => {
+          setCategory("");
+          setBudgetAmount("");
+          setModalVisible(true);
+        }}
       >
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
 
       <Modal
-        visible={modalVisible}
-        transparent={true}
         animationType="slide"
+        transparent={true}
+        visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Adicionar Orçamento</Text>
-          <TextInput
-            placeholder="Categoria"
-            value={category}
-            onChangeText={setCategory}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Valor Orçado"
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-          <Button title="Adicionar" onPress={handleAddBudget} />
-          <Button title="Fechar" onPress={() => setModalVisible(false)} />
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Adicionar Orçamento</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>X</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Picker
+              selectedValue={category}
+              style={styles.picker}
+              onValueChange={(itemValue) => setCategory(itemValue)}
+            >
+              <Picker.Item label="Selecione a Categoria" value="" />
+              <Picker.Item label="Alimentação" value="Alimentação" />
+              <Picker.Item label="Transporte" value="Transporte" />
+              <Picker.Item label="Moradia" value="Moradia" />
+              <Picker.Item label="Lazer" value="Lazer" />
+              <Picker.Item label="Educação" value="Educação" />
+              <Picker.Item label="Saúde" value="Saúde" />
+              <Picker.Item label="Utilidades" value="Utilidades" />
+              <Picker.Item label="Viagens" value="Viagens" />
+              <Picker.Item label="Eventos" value="Eventos" />
+              <Picker.Item label="Presentes" value="Presentes" />
+              <Picker.Item label="Cuidados Pessoais" value="Cuidados Pessoais" />
+              <Picker.Item label="Assinaturas" value="Assinaturas" />
+              <Picker.Item label="Impostos" value="Impostos" />
+              <Picker.Item label="Seguros" value="Seguros" />
+            </Picker>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Valor Orçado"
+              value={budgetAmount}
+              onChangeText={setBudgetAmount}
+              keyboardType="numeric"
+            />
+
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleAddBudget}
+            >
+              <Text style={styles.saveButtonText}>Salvar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 80,
   },
-  card: {
-    padding: 20,
+  chartContainer: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  chart: {
+    marginVertical: 8,
+    borderRadius: 16,
+  },
+  budgetsContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
+    borderWidth: 2,
+    borderColor: "#d4af37",
+    margin: 10,
+    padding: 10,
   },
-  cardTitle: {
+  budgetsTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#284767",
+  },
+  budgetCard: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#d4af37",
+    padding: 10,
+    marginBottom: 10,
+    elevation: 2,
+    position: "relative",
+  },
+  budgetCategory: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#376f7b",
+  },
+  budgetDetails: {
+    fontSize: 16,
+    color: "#284767",
+  },
+  budgetStatus: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 5,
+  },
+  editButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "#d4af37",
+    borderRadius: 15,
+    padding: 5,
+  },
+  editButtonText: {
+    color: "#fff",
+    fontSize: 16,
   },
   addButton: {
-    backgroundColor: "#007bff",
-    borderRadius: 30,
-    padding: 15,
+    backgroundColor: "#d4af37",
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    alignItems: "center",
+    justifyContent: "center",
     position: "absolute",
-    right: 20,
-    bottom: 20,
+    bottom: 30,
+    right: 30,
+    elevation: 5,
   },
   addButtonText: {
     color: "#fff",
-    fontSize: 24,
-    textAlign: "center",
+    fontSize: 30,
   },
-  modalView: {
-    marginTop: 100,
-    padding: 20,
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
     backgroundColor: "#fff",
     borderRadius: 10,
+    width: "90%",
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 20,
+    color: "#376f7b",
+  },
+  closeButton: {
+    backgroundColor: "#d4af37",
+    borderRadius: 20,
+    padding: 5,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: "#fff",
+  },
+  picker: {
+    height: 50,
+    width: "100%",
+    marginBottom: 10,
   },
   input: {
-    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#d4af37",
+    marginBottom: 10,
+    padding: 5,
+  },
+  saveButton: {
+    backgroundColor: "#376f7b",
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 5,
+    alignItems: "center",
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

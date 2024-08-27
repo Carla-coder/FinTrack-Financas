@@ -2,13 +2,14 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import { Ionicons } from "@expo/vector-icons";
+
 import DashboardScreen from "./src/screens/DashboardScreen";
 import TransactionsScreen from "./src/screens/TransactionsScreen";
 import BudgetsScreen from "./src/screens/BudgetsScreen";
 import ReportsScreen from "./src/screens/ReportsScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
-import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();

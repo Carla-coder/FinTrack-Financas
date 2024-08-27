@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   Modal,
   TouchableOpacity,
@@ -143,41 +142,29 @@ export default function TransactionsScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.transactionsContainer}>
-          <Text style={styles.transactionsTitle}>Novas Transações:</Text>
-          <View style={styles.transactionHeader}>
-            <Text style={styles.transactionHeaderText}>Data</Text>
-            <Text style={styles.transactionHeaderText}>Descrição</Text>
-            <Text style={styles.transactionHeaderText}>Categoria</Text>
-            <Text style={styles.transactionHeaderText}>Valor</Text>
-            <Text style={styles.transactionHeaderText}>Ação</Text>
-          </View>
-          <FlatList
-            data={transactions}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.transactionItem}>
-                <Text style={styles.transactionDetail}>{item.date}</Text>
-                <Text style={styles.transactionDetail}>{item.description}</Text>
-                <Text style={styles.transactionDetail}>{item.category}</Text>
-                <Text
-                  style={[
-                    styles.transactionAmount,
-                    { color: item.type === "renda" ? "#7ebab6" : "#376f7b" },
-                  ]}
-                >
-                  {item.type === "renda"
-                    ? `+ R$ ${item.amount.toFixed(2)}`
-                    : `- R$ ${item.amount.toFixed(2)}`}
-                </Text>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => handleEditTransaction(item)}
-                >
-                  <Text style={styles.editButtonText}>✎</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
+          <Text style={styles.transactionsTitle}>Suas Transações:</Text>
+          {transactions.map((item) => (
+            <View key={item.id} style={styles.transactionCard}>
+              <Text style={styles.transactionDate}>{item.date}</Text>
+              <Text style={styles.transactionDescription}>{item.description} - {item.category}</Text>
+              <Text
+                style={[
+                  styles.transactionAmount,
+                  { color: item.type === "renda" ? "#2aad40" : "#df4822" },
+                ]}
+              >
+                {item.type === "renda"
+                  ? `+ R$ ${item.amount.toFixed(2)}`
+                  : `- R$ ${item.amount.toFixed(2)}`}
+              </Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => handleEditTransaction(item)}
+              >
+                <Text style={styles.editButtonText}>✎</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       </ScrollView>
 
@@ -286,18 +273,19 @@ export default function TransactionsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#fff",
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 80, // Adiciona espaço para o botão de adicionar
+    paddingBottom: 80,
   },
   transactionsContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#d4af37", 
     margin: 10,
     padding: 10,
-    elevation: 3,
   },
   transactionsTitle: {
     fontSize: 18,
@@ -305,44 +293,43 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#284767",
   },
-  transactionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingBottom: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+  transactionCard: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#d4af37",
+    padding: 10,
+    marginBottom: 10,
+    elevation: 2,
   },
-  transactionHeaderText: {
+  transactionDate: {
     fontWeight: "bold",
-    width: "20%",
-    textAlign: "center",
+    color: "#376f7b",
+  },
+  transactionDescription: {
+    fontSize: 16,
     color: "#284767",
   },
-  transactionItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  transactionDetail: {
-    width: "20%",
-    textAlign: "center",
-    color: "#284767",
+  transactionCategory: {
+    fontSize: 14,
+    color: "#7ebab6",
   },
   transactionAmount: {
-    width: "20%",
-    textAlign: "center",
+    fontSize: 16,
     fontWeight: "bold",
+    marginTop: 5,
   },
   editButton: {
-    width: "20%",
-    justifyContent: "center",
-    alignItems: "center",
+    position: "absolute",
+    right: 10,
+    top: 10,
+    backgroundColor: "#c2be99",
+    borderRadius: 20,
+    padding: 5,
   },
   editButtonText: {
-    fontSize: 20,
-    color: "#7ebab6",
+    fontSize: 16,
+    color: "#284767",
   },
   addButton: {
     position: "absolute",
@@ -350,15 +337,14 @@ const styles = StyleSheet.create({
     right: 30,
     width: 60,
     height: 60,
-    borderRadius: 30,
     backgroundColor: "#376f7b",
+    borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
   },
   addButtonText: {
-    color: "#fff",
     fontSize: 30,
+    color: "#fff",
   },
   modalContainer: {
     flex: 1,
@@ -369,13 +355,14 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    width: "80%",
     padding: 20,
-    elevation: 5,
+    width: "80%",
+    maxWidth: 400,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   modalTitle: {
@@ -384,33 +371,41 @@ const styles = StyleSheet.create({
     color: "#284767",
   },
   closeButton: {
-    padding: 10,
+    backgroundColor: "#c2be99",
+    borderRadius: 20,
+    padding: 5,
   },
   closeButtonText: {
-    fontSize: 18,
-    color: "#376f7b",
+    fontSize: 16,
+    color: "#284767",
   },
   input: {
-    height: 40,
-    borderColor: "#ddd",
     borderBottomWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    color: "#284767",
+    borderBottomColor: "#d4af37",
+    marginBottom: 10,
+    padding: 8,
+    fontSize: 16,
   },
   picker: {
     height: 50,
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 10,
+    backgroundColor: "white",
+    borderColor: "transparent",
+    borderWidth: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: "#d4af37",
   },
+  
   saveButton: {
-    backgroundColor: "#7ebab6",
+    backgroundColor: "#376f7b",
     borderRadius: 5,
-    paddingVertical: 10,
+    padding: 10,
     alignItems: "center",
   },
   saveButtonText: {
     color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
