@@ -23,7 +23,6 @@ export default function TransactionsScreen() {
   const [editMode, setEditMode] = useState(false);
   const [editItem, setEditItem] = useState(null);
 
-  // Carregar transações salvas
   React.useEffect(() => {
     const loadTransactions = async () => {
       try {
@@ -53,7 +52,6 @@ export default function TransactionsScreen() {
       const updatedTransactions = [...transactions, newTransaction];
       setTransactions(updatedTransactions);
 
-      // Salvar no AsyncStorage
       try {
         await AsyncStorage.setItem(
           "transactions",
@@ -102,7 +100,6 @@ export default function TransactionsScreen() {
 
       setTransactions(updatedTransactions);
 
-      // Salvar no AsyncStorage
       try {
         await AsyncStorage.setItem(
           "transactions",
@@ -130,13 +127,13 @@ export default function TransactionsScreen() {
     let formattedDate = "";
 
     if (numbers.length > 0) {
-      formattedDate += numbers.slice(0, 2); // Dia
+      formattedDate += numbers.slice(0, 2);
     }
     if (numbers.length >= 3) {
-      formattedDate += "/" + numbers.slice(2, 4); // Mês
+      formattedDate += "/" + numbers.slice(2, 4);
     }
     if (numbers.length >= 5) {
-      formattedDate += "/" + numbers.slice(4, 8); // Ano
+      formattedDate += "/" + numbers.slice(4, 8);
     }
 
     setDate(formattedDate);
@@ -293,70 +290,75 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    paddingBottom: 80, // Adiciona espaço para o botão de adicionar
   },
   transactionsContainer: {
     backgroundColor: "#fff",
-    borderRadius: 5,
+    borderRadius: 10,
     margin: 10,
     padding: 10,
-    elevation: 2,
+    elevation: 3,
   },
   transactionsTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#284767",
   },
   transactionHeader: {
     flexDirection: "row",
-    paddingVertical: 10,
+    justifyContent: "space-between",
+    paddingBottom: 5,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    backgroundColor: "#f1f1f1",
+    borderBottomColor: "#ddd",
   },
   transactionHeaderText: {
-    flex: 1,
-    textAlign: "center",
     fontWeight: "bold",
+    width: "20%",
+    textAlign: "center",
+    color: "#284767",
   },
   transactionItem: {
     flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#ddd",
   },
   transactionDetail: {
-    flex: 1,
+    width: "20%",
     textAlign: "center",
+    color: "#284767",
   },
   transactionAmount: {
-    flex: 1,
+    width: "20%",
     textAlign: "center",
     fontWeight: "bold",
   },
   editButton: {
-    flex: 1,
-    alignItems: "center",
+    width: "20%",
     justifyContent: "center",
+    alignItems: "center",
   },
   editButtonText: {
-    fontSize: 18,
-    color: "#007bff",
+    fontSize: 20,
+    color: "#7ebab6",
   },
   addButton: {
     position: "absolute",
-    bottom: 20,
-    right: 20,
+    bottom: 30,
+    right: 30,
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#007bff",
-    alignItems: "center",
+    backgroundColor: "#376f7b",
     justifyContent: "center",
+    alignItems: "center",
     elevation: 5,
   },
   addButtonText: {
-    fontSize: 30,
     color: "#fff",
+    fontSize: 30,
   },
   modalContainer: {
     flex: 1,
@@ -365,47 +367,46 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: "90%",
     backgroundColor: "#fff",
     borderRadius: 10,
+    width: "80%",
     padding: 20,
     elevation: 5,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 20,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#284767",
   },
   closeButton: {
-    backgroundColor: "#ff5c5c",
-    borderRadius: 20,
-    padding: 5,
-  },
-  closeButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    marginBottom: 15,
     padding: 10,
   },
+  closeButtonText: {
+    fontSize: 18,
+    color: "#376f7b",
+  },
+  input: {
+    height: 40,
+    borderColor: "#ddd",
+    borderBottomWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    color: "#284767",
+  },
   picker: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 15,
+    height: 50,
+    width: "100%",
+    marginBottom: 20,
   },
   saveButton: {
-    backgroundColor: "#007bff",
-    padding: 15,
+    backgroundColor: "#7ebab6",
     borderRadius: 5,
+    paddingVertical: 10,
     alignItems: "center",
   },
   saveButtonText: {

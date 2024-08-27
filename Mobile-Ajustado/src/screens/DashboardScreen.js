@@ -109,10 +109,12 @@ export default function DashboardScreen() {
           label: "Despesas",
         },
       ],
+      legend: ["Renda", "Despesas"],
     };
   };
 
   const preparePieChartData = () => {
+    const colors = ["#ff9999", "#66b3ff", "#99ff99", "#ffcc99", "#c2c2f0", "#ffb3e6"];
     let categoryTotals = {};
 
     transactions.forEach((transaction) => {
@@ -124,12 +126,13 @@ export default function DashboardScreen() {
       }
     });
 
-    return Object.keys(categoryTotals).map((category) => ({
+    return Object.keys(categoryTotals).map((category, index) => ({
       name: category,
       amount: categoryTotals[category],
-      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15,
+      color: colors[index % colors.length],
+      legendFontColor: "#284767",
+      legendFontSize: 12,
+      label: `R$ ${categoryTotals[category].toFixed(2)}`, // Adiciona "R$" na frente do valor
     }));
   };
 
@@ -142,8 +145,7 @@ export default function DashboardScreen() {
   );
 
   return (
-    <View style={styles.container}>
-
+    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       {menuVisible && (
         <View style={styles.menuContainer}>
           <TouchableOpacity onPress={() => navigation.navigate("Transactions")}>
@@ -157,55 +159,57 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
       )}
-        <View style={styles.balanceContainer}>
-          <View style={styles.card}>
-            <Text style={styles.title}>Saldo Atual:</Text>
-            <Text
-              style={[
-                styles.balance,
-                { color: balance >= 0 ? "#2aad40" : "#df4822" },
-              ]}
-            >
-              R$ {balance.toFixed(2)}
-            </Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.title}>Gastos do Mês:</Text>
-            <Text style={[styles.balance, { color: "#df4822" }]}>
-              R$ {expenses ? expenses.toFixed(2) : "0.00"}
-            </Text>
-          </View>
+
+      <View style={styles.balanceContainer}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Saldo Atual:</Text>
+          <Text
+            style={[
+              styles.balance,
+              { color: balance >= 0 ? "#2aad40" : "#df4822" },
+            ]}
+          >
+            R$ {balance.toFixed(2)}
+          </Text>
+        </View>
+        <View style={styles.card}>
+          <Text style={styles.title}>Gastos do Mês:</Text>
+          <Text style={[styles.balance, { color: "#df4822" }]}>
+            R$ {expenses ? expenses.toFixed(2) : "0.00"}
+          </Text>
+        </View>
+      </View>
+
+      <View style={[styles.chartRow, { flexDirection: screenWidth > 600 ? "row" : "column" }]}>
+        <View style={[styles.chartContainer, { width: screenWidth > 600 ? "48%" : "100%" }]}>
+          <Text style={styles.chartTitle}>Fluxo de Caixa:</Text>
+          <LineChart
+            data={prepareLineChartData()}
+            width={screenWidth > 500 ? (screenWidth - 60) / 2 : screenWidth - 60}
+            height={100}
+            chartConfig={{
+              backgroundColor: "#fff",
+              backgroundGradientFrom: "#fff",
+              backgroundGradientTo: "#fff",
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            }}
+            style={styles.chart}
+            bezier
+          />
         </View>
 
-        <View style={[styles.chartRow, { flexDirection: screenWidth > 600 ? 'row' : 'column' }]}>
-          <View style={[styles.chartContainer, { width: screenWidth > 600 ? '48%' : '100%' }]}>
-            <Text style={styles.chartTitle}>Fluxo de Caixa:</Text>
-            <LineChart
-              data={prepareLineChartData()}
-              width={screenWidth > 600 ? (screenWidth - 60) / 2 : screenWidth - 40}
-              height={220}
-              chartConfig={{
-                backgroundColor: "#fff",
-                backgroundGradientFrom: "#f4f4f4",
-                backgroundGradientTo: "#f4f4f4",
-                decimalPlaces: 2,
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              }}
-              style={styles.chart}
-            />
-            </View>
-          </View>
-
-          {/* <View style={[styles.chartContainer, { width: screenWidth > 600 ? '48%' : '100%' }]}>
-            <Text style={styles.chartTitle}>Categorias de Gastos:</Text>
+        <View style={[styles.chartContainer, { width: screenWidth > 600 ? "48%" : "100%" }]}>
+          <Text style={styles.chartTitle}>Categorias de Gastos:</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <PieChart
               data={preparePieChartData()}
-              width={screenWidth > 600 ? (screenWidth - 60) / 2 : screenWidth - 40}
-              height={220}
+              width={screenWidth > 500 ? (screenWidth - 60) / 2 : screenWidth - 60}
+              height={120}
               chartConfig={{
                 backgroundColor: "#fff",
-                backgroundGradientFrom: "#f4f4f4",
-                backgroundGradientTo: "#f4f4f4",
+                backgroundGradientFrom: "#fff",
+                backgroundGradientTo: "#fff",
                 decimalPlaces: 1,
                 color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               }}
@@ -213,58 +217,41 @@ export default function DashboardScreen() {
               backgroundColor="transparent"
               paddingLeft="15"
               style={styles.chart}
+              absolute
             />
           </View>
-        </View> */}
-
-        <View style={styles.transactionsContainer}>
-          <Text style={styles.transactionsTitle}>Últimas Transações:</Text>
-          <View style={styles.transactionHeader}>
-            <Text style={styles.transactionHeaderText}>Data</Text>
-            <Text style={styles.transactionHeaderText}>Descrição</Text>
-            <Text style={styles.transactionHeaderText}>Valor</Text>
-          </View>
-          <FlatList
-            data={transactions.slice(-3)}
-            renderItem={renderTransactionItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
         </View>
-    </View>
+      </View>
+
+      <View style={styles.transactionsContainer}>
+        <Text style={styles.transactionsTitle}>Últimas Transações:</Text>
+        <View style={styles.transactionHeader}>
+          <Text style={styles.transactionHeaderText}>Data</Text>
+          <Text style={styles.transactionHeaderText}>Descrição</Text>
+          <Text style={styles.transactionHeaderText}>Valor</Text>
+        </View>
+        <FlatList
+          data={transactions.slice(-2)}
+          renderItem={renderTransactionItem}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#fff",
   },
-  headerContainer: {
-    width: "100%",
-  },
-  financialManagementContainer: {
-    backgroundColor: "#33608d",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  financialManagementText: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  menuIcon: {
-    marginLeft: 10,
+  container: {
+    padding: 10,
   },
   menuContainer: {
     backgroundColor: "#fff",
     padding: 10,
     elevation: 2,
-    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -277,24 +264,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#33608d",
   },
-  scrollView: {
-    flexGrow: 1,
-  },
   balanceContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
     height: 80,
-    width: "100%",
-    flex: 1,
-    marginHorizontal: 3,
+    width: "48%",
     alignItems: "center",
     elevation: 3,
+    borderColor: "#d4af37", // Borda dourada
+    borderWidth: 1,
   },
   title: {
     fontSize: 16,
@@ -302,64 +286,89 @@ const styles = StyleSheet.create({
     color: "#284767",
   },
   balance: {
-    fontSize: 17,
+    fontSize: 24,
     fontWeight: "bold",
-    marginTop: 10,
   },
-  // chartRow: {
-  //   justifyContent: "space-between",
-  //   marginBottom: 20,
-  // },
-  // chartContainer: {
-  //   backgroundColor: "#fff",
-  //   borderRadius: 10,
-  //   padding: 20,
-  //   marginBottom: 20,
-  //   elevation: 3,
-  //   alignItems: "center",
-  // },
-  // chartTitle: {
-  //   fontSize: 18,
-  //   fontWeight: "bold",
-  //   color: "#284767",
-  // },
+  chartRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    color: "#284767",
+  },
+  chartContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 10,
+    elevation: 3,
+    borderColor: "#d4af37", // Borda dourada
+    borderWidth: 1,
+    marginBottom: 5,
+  },
   chartTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: "#284767",
-    },
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "#284767",
+    textAlign: "center",
+  },
+  chart: {
+    borderRadius: 5,
+  },
   transactionsContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    padding: 20,
-    marginTop: 20,
-    marginBottom: 10,
+    padding: 10,
     elevation: 3,
+    marginTop: 5,
+    borderColor: "#d4af37", // Borda dourada
+    borderWidth: 1,
   },
   transactionsTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#284767",
+    textAlign: "center",
+  },
+  transactionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  transactionText: {
+    fontSize: 14,
     color: "#284767",
   },
   transactionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
   transactionHeaderText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     color: "#376f7b",
-
   },
-  transactionRow: {
+  legendContainer: {
+    marginTop: 10,
+    alignItems: "center",
+  },
+  legendItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 5,
   },
-  transactionText: {
-    fontSize: 16,
+  legendColor: {
+    width: 14,
+    height: 14,
+    marginRight: 5,
+    borderRadius: 7,
+  },
+  legendText: {
+    fontSize: 12,
     color: "#376f7b",
   },
 });
