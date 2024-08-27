@@ -17,14 +17,18 @@ export default function ReportsScreen() {
   useEffect(() => {
     const loadTransactions = async () => {
       try {
-        const savedTransactions = await AsyncStorage.getItem("transactions");
-        if (savedTransactions !== null) {
-          setTransactions(JSON.parse(savedTransactions));
+        const currentUser = await AsyncStorage.getItem("currentUser");
+        if (currentUser) {
+          const savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
+          if (savedTransactions !== null) {
+            setTransactions(JSON.parse(savedTransactions));
+          }
         }
       } catch (error) {
         console.error("Erro ao carregar transações:", error);
       }
     };
+
     loadTransactions();
   }, []);
 
@@ -269,43 +273,34 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   incomeText: {
-    color: '#002C77', 
     fontSize: 16,
-    marginBottom: 5,
+    fontWeight: "bold",
+    color: "#376f7b",
   },
   incomeValue: {
-    color: '#4CAF50', 
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "#47a447",
   },
   expenseText: {
-    color: '#002C77', 
     fontSize: 16,
-    marginBottom: 5,
+    fontWeight: "bold",
+    color: "#376f7b",
   },
   expenseValue: {
-    color: '#F44336', 
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "#d9534f",
   },
   balanceText: {
-    color: '#002C77', 
     fontSize: 16,
-    marginBottom: 5,
+    fontWeight: "bold",
+    color: "#376f7b",
   },
   balanceValue: {
-    color: '#4CAF50', 
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "#5bc0de",
   },
   savingsText: {
-    color: '#002C77', 
     fontSize: 16,
-    marginBottom: 5,
+    color: "#284767",
   },
   savingsValue: {
-    color: '#4CAF50', 
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "#47a447",
   },
 });
