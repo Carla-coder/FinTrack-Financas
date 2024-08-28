@@ -147,7 +147,14 @@ export default function DashboardScreen({ navigation }) {
     <View style={styles.transactionRow}>
       <Text style={styles.transactionText}>{item.date}</Text>
       <Text style={styles.transactionText}>{item.description}</Text>
-      <Text style={styles.transactionText}>R$ {item.amount.toFixed(2)}</Text>
+      <Text
+        style={[
+          styles.transactionText,
+          { color: item.type === "despesa" ? "#df4822" : "#284767" },
+        ]}
+      >
+        {item.type === "despesa" ? `- R$ ${item.amount.toFixed(2)}` : `R$ ${item.amount.toFixed(2)}`}
+      </Text>
     </View>
   );
 

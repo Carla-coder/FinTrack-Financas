@@ -282,8 +282,6 @@ const styles = StyleSheet.create({
   transactionsContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#d4af37", 
     margin: 10,
     padding: 10,
   },
@@ -323,13 +321,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 10,
     top: 10,
-    backgroundColor: "#c2be99",
+    backgroundColor: "#284767",
     borderRadius: 20,
     padding: 5,
   },
   editButtonText: {
     fontSize: 16,
-    color: "#284767",
+    color: "#ffff",
   },
   addButton: {
     position: "absolute",

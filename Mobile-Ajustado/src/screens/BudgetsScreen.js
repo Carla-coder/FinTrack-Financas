@@ -8,11 +8,13 @@ import {
   TextInput,
   ScrollView,
   Dimensions,
+  FlatList,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js";
+import { v4 as uuidv4 } from 'uuid';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -26,11 +28,12 @@ export default function BudgetScreen() {
     labels: [],
     datasets: [
       {
-        label: 'Gastos por Categoria',
+        label: 'Gastos por Categoria (%)',
         data: [],
         backgroundColor: 'rgba(72, 138, 201, 0.6)',
         borderColor: 'rgba(72, 138, 201, 1)',
         borderWidth: 1,
+        barThickness: 15,
       },
     ],
   });
@@ -63,19 +66,22 @@ export default function BudgetScreen() {
         .filter((transaction) => transaction.category === budget.category)
         .reduce((acc, transaction) => acc + transaction.amount, 0);
 
+      const percentageSpent = (spentAmount / budget.budgetAmount) * 100;
+
       labels.push(budget.category);
-      chartData.push(spentAmount);
+      chartData.push(percentageSpent);
     });
 
     setData({
       labels,
       datasets: [
         {
-          label: 'Gastos por Categoria',
+          label: 'Gastos por Categoria (%)',
           data: chartData,
           backgroundColor: 'rgba(72, 138, 201, 0.6)',
           borderColor: 'rgba(72, 138, 201, 1)',
           borderWidth: 1,
+          barThickness: 15,
         },
       ],
     });
@@ -84,7 +90,7 @@ export default function BudgetScreen() {
   const handleAddBudget = async () => {
     if (category && budgetAmount) {
       const newBudget = {
-        id: budgets.length + 1,
+        id: uuidv4(), // Gere um ID único
         category,
         budgetAmount: parseFloat(budgetAmount),
       };
@@ -106,85 +112,137 @@ export default function BudgetScreen() {
     }
   };
 
+  const handleDeleteBudget = async (id) => {
+    const updatedBudgets = budgets.filter(budget => budget.id !== id);
+    setBudgets(updatedBudgets);
+
+    try {
+      await AsyncStorage.setItem("budgets", JSON.stringify(updatedBudgets));
+    } catch (error) {
+      console.error("Erro ao excluir orçamento:", error);
+    }
+  };
+
+  const renderBudgetCard = ({ item }) => {
+    const spentAmount = transactions
+      .filter((transaction) => transaction.category === item.category)
+      .reduce((acc, transaction) => acc + transaction.amount, 0);
+    const isExceeded = spentAmount > item.budgetAmount;
+  
+    return (
+      <View style={styles.budgetCard}>
+        <Text style={styles.budgetCategory}>{item.category}</Text>
+        <Text style={[styles.budgetDetails, styles.budgetOrcado]}>
+          Orçado: <Text style={styles.greenText}>+R${item.budgetAmount.toFixed(2)}</Text>
+        </Text>
+        <Text style={[styles.budgetDetails, styles.budgetGasto]}>
+          Gasto: <Text style={styles.redText}>-R${spentAmount.toFixed(2)}</Text>
+        </Text>
+        <Text
+          style={[
+            styles.budgetStatus,
+            { color: isExceeded ? "#df4822" : "#2aad40" },
+          ]}
+        >
+          {isExceeded ? "Excedido" : "Alinhado"}
+        </Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => {
+              setCategory(item.category);
+              setBudgetAmount(item.budgetAmount.toString());
+              setModalVisible(true);
+            }}
+          >
+            <Text style={styles.editButtonText}>Editar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDeleteBudget(item.id)}
+          >
+            <Text style={styles.deleteButtonText}>Excluir</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.chartContainer}>
-        <Bar
-            data={data}
-            width={Dimensions.get("window").width - 30} // Largura do gráfico
-            height={250} // Altura do gráfico
-            options={{
-              indexAxis: 'y', // Configura o gráfico como horizontal
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'top',
+        <View style={styles.cardContainer}>
+          <Text style={styles.Title}>Suas Metas:</Text>
+          <View style={styles.chartContainer}>
+            <Bar
+              data={data}
+              width={Dimensions.get("window").width - 30}
+              height={230}
+              options={{
+                responsive: true,
+                indexAxis: 'y',
+                plugins: {
+                  legend: {
+                    position: 'top',
+                    labels: {
+                      color: '#284767',
+                      font: {
+                        size: 14,
+                      },
+                    },
+                  },
+                  tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#284767',
+                    bodyColor: '#376f7b',
+                    borderColor: '#d4af37',
+                    borderWidth: 1,
+                    callbacks: {
+                      label: function (tooltipItem) {
+                        return `${tooltipItem.raw.toFixed(2)}%`;
+                      },
+                    },
+                  },
                 },
-                tooltip: {
-                  callbacks: {
-                    label: function(tooltipItem) {
-                      return `R$ ${tooltipItem.raw.toFixed(2)}`;
-                    }
-                  }
-                }
-              },
-              scales: {
-                x: {
-                  beginAtZero: true,
-                  ticks: {
-                    callback: function(value) {
-                      return `R$ ${value}`;
-                    }
-                  }
+                scales: {
+                  x: {
+                    beginAtZero: true,
+                    ticks: {
+                      color: '#376f7b',
+                      callback: function (value) {
+                        return `${value}%`;
+                      },
+                    },
+                    grid: {
+                      color: '#ccc',
+                    },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      color: '#376f7b',
+                    },
+                    grid: {
+                      color: '#ccc',
+                    },
+                  },
                 },
-                y: {
-                  beginAtZero: true,
-                }
-              }
-            }}
-            style={styles.chart}
-          />
+              }}
+              style={styles.chart}
+            />
+          </View>
         </View>
 
         <View style={styles.budgetsContainer}>
           <Text style={styles.budgetsTitle}>Orçamentos:</Text>
-          {budgets.map((item) => {
-            const spentAmount = transactions
-              .filter((transaction) => transaction.category === item.category)
-              .reduce((acc, transaction) => acc + transaction.amount, 0);
-            const isExceeded = spentAmount > item.budgetAmount;
-
-            return (
-              <View key={item.id} style={styles.budgetCard}>
-                <Text style={styles.budgetCategory}>{item.category}</Text>
-                <Text style={styles.budgetDetails}>
-                  Valor Orçado: R$ {item.budgetAmount.toFixed(2)}
-                </Text>
-                <Text style={styles.budgetDetails}>
-                  Valor Gasto: R$ {spentAmount.toFixed(2)}
-                </Text>
-                <Text
-                  style={[
-                    styles.budgetStatus,
-                    { color: isExceeded ? "#df4822" : "#2aad40" },
-                  ]}
-                >
-                  {isExceeded ? "Excedido" : "Dentro do Orçamento"}
-                </Text>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => {
-                    setCategory(item.category);
-                    setBudgetAmount(item.budgetAmount.toString());
-                    setModalVisible(true);
-                  }}
-                >
-                  <Text style={styles.editButtonText}>✎</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+          <FlatList
+            data={budgets}
+            renderItem={renderBudgetCard}
+            keyExtractor={(item) => item.id}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.budgetsGrid}
+          />
         </View>
       </ScrollView>
 
@@ -230,27 +288,17 @@ export default function BudgetScreen() {
               <Picker.Item label="Educação" value="Educação" />
               <Picker.Item label="Saúde" value="Saúde" />
               <Picker.Item label="Utilidades" value="Utilidades" />
-              <Picker.Item label="Viagens" value="Viagens" />
-              <Picker.Item label="Eventos" value="Eventos" />
-              <Picker.Item label="Presentes" value="Presentes" />
-              <Picker.Item label="Cuidados Pessoais" value="Cuidados Pessoais" />
-              <Picker.Item label="Assinaturas" value="Assinaturas" />
-              <Picker.Item label="Impostos" value="Impostos" />
-              <Picker.Item label="Seguros" value="Seguros" />
             </Picker>
 
             <TextInput
               style={styles.input}
               placeholder="Valor Orçado"
-              value={budgetAmount}
-              onChangeText={setBudgetAmount}
               keyboardType="numeric"
+              value={budgetAmount}
+              onChangeText={(text) => setBudgetAmount(text)}
             />
 
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleAddBudget}
-            >
+            <TouchableOpacity style={styles.saveButton} onPress={handleAddBudget}>
               <Text style={styles.saveButtonText}>Salvar</Text>
             </TouchableOpacity>
           </View>
@@ -263,142 +311,171 @@ export default function BudgetScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: 80,
+    padding: 10,
+  },
+  cardContainer: {
+    marginBottom: 20,
+  },
+  Title: {
+    fontSize: 17,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#284767",
+  },
+  greenText: {
+    color: "#2aad40",
+  },
+  redText: {
+    color: "#df4822", 
   },
   chartContainer: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
-    marginHorizontal: 10,
-  },
-  budgetsContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "#d4af37",
-    margin: 10,
     padding: 10,
+    marginBottom: 10,
     elevation: 2,
+  },
+  chart: {
+    width: '100%',
+  },
+  budgetsContainer: {
+    marginTop: 20,
   },
   budgetsTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
     color: "#284767",
+  },
+  budgetsGrid: {
+    flexDirection: 'row',
   },
   budgetCard: {
     backgroundColor: "#fff",
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#d4af37",
     padding: 15,
-    marginBottom: 10,
-    position: "relative",
+    marginBottom: 15,
+    borderColor: "#d4af37",
+    borderWidth: 1,
+    marginHorizontal: 6,
+    width: Dimensions.get('window').width / 1.8, 
   },
   budgetCategory: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: 'bold',
     color: "#284767",
   },
   budgetDetails: {
-    fontSize: 16,
-    color: "#284767",
-  },
-  budgetStatus: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 14,
     marginTop: 5,
   },
+  budgetOrcado: {
+    color: '#284767',
+  },
+  budgetGasto: {
+    color: '#376f7b',
+  },
+  budgetStatus: {
+    marginTop: 10,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
   editButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 5,
-    backgroundColor: "#7ebab6",
-    borderRadius: 10,
+    backgroundColor: '#7ebab6',
+    padding: 10,
+    borderRadius: 5,
+  },
+  deleteButton: {
+    backgroundColor: '#df4822',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
   },
   editButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+  },
+  deleteButtonText: {
+    color: '#fff',
   },
   addButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: "#7ebab6",
+    backgroundColor: '#376f7b',
     width: 60,
     height: 60,
     borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
     elevation: 5,
   },
   addButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 30,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: 300,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
+    width: '80%',
     borderRadius: 10,
     padding: 20,
-    elevation: 5,
   },
   modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#284767",
+    fontWeight: 'bold',
   },
   closeButton: {
-    backgroundColor: "#7ebab6",
-    borderRadius: 10,
-    padding: 5,
+    backgroundColor: '#df4822',
+    borderRadius: 20,
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   closeButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontSize: 18,
   },
   picker: {
     height: 50,
-    width: "100%",
-    marginBottom: 10,
+    marginTop: 10,
   },
   input: {
+    height: 40,
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderColor: "#7ebab6",
     borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    color: "#284767",
+    marginTop: 10,
+    paddingHorizontal: 10,
   },
   saveButton: {
-    backgroundColor: "#7ebab6",
-    borderRadius: 5,
+    backgroundColor: '#7ebab6',
     padding: 10,
-    alignItems: "center",
+    borderRadius: 5,
+    marginTop: 20,
   },
   saveButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
