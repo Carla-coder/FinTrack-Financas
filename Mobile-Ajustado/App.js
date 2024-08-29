@@ -37,6 +37,7 @@ function AppTabs() {
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Transações" component={TransactionsScreen} />
+      
       <Tab.Screen name="Orçamentos" component={BudgetsScreen} />
       <Tab.Screen name="Relatórios" component={ReportsScreen} />
     </Tab.Navigator>
