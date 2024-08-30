@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "fintrack",
+    "slug": "fintrack",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logomarca.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/logomarca.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logomarca.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.ledev.fintrack"
+    },
+    "web": {
+      "favicon": "./assets/logomarca.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b07f749e-61c3-4ed8-9a03-c5f9c5c41c4c"
+      }
+    }
+  }
+}
