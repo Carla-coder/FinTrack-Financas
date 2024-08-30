@@ -7,7 +7,7 @@
     "icon": "./assets/logomarca.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logomarca.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,7 +19,7 @@
         "foregroundImage": "./assets/logomarca.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.leticiadev.fintrack"
+      "package": "com.ledev.fintrack"
     },
     "web": {
       "favicon": "./assets/logomarca.png"
