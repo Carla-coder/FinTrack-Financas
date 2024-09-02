@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#f4f4f4",
   },
   inputGroup: {
     flexDirection: "row",
