@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Button, Picker } from "react-native";
-import { BarChart, LineChart, PieChart } from "react-native-chart-kit";
+import { View, Text, ScrollView, StyleSheet, Button, Dimensions } from "react-native";
+import { Picker } from '@react-native-picker/picker';
+import { BarChart, PieChart } from "react-native-chart-kit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -83,13 +83,12 @@ export default function ReportsScreen() {
     switch (reportType) {
       case "category-breakdown":
         return {
-          labels: reportData.labels,
           data: reportData.labels.map((label, index) => ({
             name: label,
             amount: reportData.data[index],
-            color: `rgba(55, 111, 123, 0.6)`,
+            color: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.6)`,
             legendFontColor: "#7f7f7f",
-            legendFontSize: 12, // Ajustar o tamanho da fonte do legend
+            legendFontSize: 12,
           })),
         };
       case "budget-performance":
@@ -104,17 +103,6 @@ export default function ReportsScreen() {
             {
               data: reportData.data,
               color: (opacity = 1) => `rgba(55, 111, 123, ${opacity})`,
-              strokeWidth: 2,
-            }
-          ],
-        };
-      case "savings-trend":
-        return {
-          labels: reportData.labels,
-          datasets: [
-            {
-              data: reportData.data,
-              color: (opacity = 1) => `rgba(51, 96, 141, ${opacity})`,
               strokeWidth: 2,
             }
           ],
@@ -134,8 +122,8 @@ export default function ReportsScreen() {
         return (
           <PieChart
             data={data.data}
-            width={width - 40} // Ajuste a largura dos gráficos
-            height={150} // Ajuste a altura dos gráficos
+            width={width - 40}
+            height={150}
             chartConfig={{
               backgroundColor: "#ffffff",
               backgroundGradientFrom: "#ffffff",
@@ -157,29 +145,8 @@ export default function ReportsScreen() {
         return (
           <BarChart
             data={data}
-            width={width - 110} 
-            height={150} 
-            chartConfig={{
-              backgroundColor: "#ffffff",
-              backgroundGradientFrom: "#ffffff",
-              backgroundGradientTo: "#ffffff",
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              propsForDots: {
-                r: "6",
-                strokeWidth: "2",
-                stroke: "#ffffff",
-              },
-            }}
-            fromZero
-          />
-        );
-      case "savings-trend":
-        return (
-          <LineChart
-            data={data}
-            width={width - 40}
-            height={130} 
+            width={width - 80}
+            height={220}
             chartConfig={{
               backgroundColor: "#ffffff",
               backgroundGradientFrom: "#ffffff",
@@ -207,17 +174,14 @@ export default function ReportsScreen() {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Filtros de Relatório</Text>
         <Text style={styles.label}>Tipo de Relatório:</Text>
-        <View style={styles.filterRow}>
-          <Picker
-            selectedValue={reportType}
-            style={styles.picker}
-            onValueChange={handleReportTypeChange}
-          >
-            <Picker.Item label="Detalhamento por Categoria" value="category-breakdown" />
-            <Picker.Item label="Desempenho do Orçamento" value="budget-performance" />
-            <Picker.Item label="Tendência de Economia" value="savings-trend" />
-          </Picker>
-        </View>
+        <Picker
+          selectedValue={reportType}
+          style={styles.picker}
+          onValueChange={handleReportTypeChange}
+        >
+          <Picker.Item label="Detalhamento por Categoria" value="category-breakdown" />
+          <Picker.Item label="Desempenho do Orçamento" value="budget-performance" />
+        </Picker>
         <Button title="Gerar Relatório" onPress={handleGenerateReport} color="#376f7b" />
       </View>
 
@@ -250,7 +214,6 @@ export default function ReportsScreen() {
               </Text>
             </View>
           </View>
-
         </>
       )}
     </ScrollView>
@@ -284,11 +247,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#376f7b",
   },
-  filterRow: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    marginBottom: 10,
-  },
   label: {
     fontSize: 16,
     marginBottom: 5,
@@ -313,29 +271,41 @@ const styles = StyleSheet.create({
   incomeText: {
     color: '#002C77', 
     fontSize: 16,
+    marginBottom: 5,
+  },
+  incomeValue: {
+    color: '#4CAF50', 
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   expenseText: {
     color: '#002C77', 
     fontSize: 16,
+    marginBottom: 5,
+  },
+  expenseValue: {
+    color: '#F44336', 
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   balanceText: {
     color: '#002C77', 
     fontSize: 16,
-  },
-  savingsText: {
-    color: '#002C77',
-    fontSize: 16,
-  },
-  incomeValue: {
-    color: '#2aad40', 
-  },
-  expenseValue: {
-    color: '#FF0000',
+    marginBottom: 5,
   },
   balanceValue: {
-    color: '#2aad40', 
+    color: '#4CAF50', 
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  savingsText: {
+    color: '#002C77', 
+    fontSize: 16,
+    marginBottom: 5,
   },
   savingsValue: {
-    color: '#2aad40',
+    color: '#4CAF50', 
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

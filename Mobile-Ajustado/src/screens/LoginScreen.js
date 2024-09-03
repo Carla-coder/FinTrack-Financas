@@ -16,26 +16,21 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      console.log("Tentando login:", email, password); 
-      const storedEmail = await AsyncStorage.getItem("userEmail");
-      const storedPassword = await AsyncStorage.getItem("userPassword");
-
-      console.log("Email armazenado:", storedEmail); 
-      console.log("Senha armazenada:", storedPassword); 
-
-      if (!storedEmail || !storedPassword) {
+      const storedPassword = await AsyncStorage.getItem(`${email}_userPassword`);
+  
+      if (!storedPassword) {
         Alert.alert("Erro", "Você precisa se cadastrar primeiro!");
         return;
       }
-
-      if (email === storedEmail && password === storedPassword) {
+  
+      if (password === storedPassword) {
         Alert.alert("Sucesso", "Login realizado com sucesso!");
-        navigation.navigate("AppTabs"); 
+        navigation.navigate("AppTabs", { email });
       } else {
         Alert.alert("Erro", "Email ou senha incorretos!");
       }
     } catch (error) {
-      console.error("Erro ao fazer login:", error); 
+      console.error("Erro ao fazer login:", error);
       Alert.alert("Erro", "Ocorreu um erro ao fazer login.");
     }
   };
@@ -87,6 +82,7 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -99,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 130, 
+    width: 130,
     height: 130,
   },
   loginContainer: {
@@ -108,7 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     padding: 20,
     borderRadius: 10,
-    borderColor: "#c2be99", 
+    borderColor: "#c2be99",
     borderWidth: 1,
     elevation: 5,
   },
@@ -117,13 +113,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#284767", 
+    color: "#284767",
   },
   welcomeMessage: {
     marginBottom: 20,
     textAlign: "center",
     fontSize: 18,
-    color: "#376f7b", 
+    color: "#376f7b",
   },
   formGroup: {
     marginBottom: 15,
@@ -149,7 +145,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#ffffff",
     fontWeight: "bold",
-    fontSize: 17, 
+    fontSize: 17,
   },
   registerButton: {
     marginTop: 20,
@@ -158,7 +154,7 @@ const styles = StyleSheet.create({
   registerButtonText: {
     color: "#7ebab6",
     fontSize: 12,
-    fontWeight: "bold", 
+    fontWeight: "bold",
   },
 });
 

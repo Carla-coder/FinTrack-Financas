@@ -25,8 +25,7 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      await AsyncStorage.setItem("userEmail", email);
-      await AsyncStorage.setItem("userPassword", password);
+      await AsyncStorage.setItem(`${email}_userPassword`, password);
       Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
       navigation.navigate("Login");
     } catch (error) {

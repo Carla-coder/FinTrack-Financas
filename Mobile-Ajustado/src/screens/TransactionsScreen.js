@@ -221,6 +221,7 @@ export default function TransactionsScreen() {
               <Picker.Item label="Alimentação" value="Alimentação" />
               <Picker.Item label="Renda Fixa" value="Renda Fixa" />
               <Picker.Item label="Transporte" value="Transporte" />
+              <Picker.Item label="Combustivel" value="Combustivel" />
               <Picker.Item label="Moradia" value="Moradia" />
               <Picker.Item label="Lazer" value="Lazer" />
               <Picker.Item label="Educação" value="Educação" />

@@ -12,8 +12,6 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LineChart } from "react-native-chart-kit";
-import { v4 as uuidv4 } from 'uuid';
 
 export default function BudgetScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -22,23 +20,6 @@ export default function BudgetScreen() {
   const [budgets, setBudgets] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [editingBudget, setEditingBudget] = useState(null);
-  const [data, setData] = useState({
-    labels: [],
-    datasets: [
-      {
-        data: [],
-        color: () => `#df4822`, // Red color for spent data
-        label: "Gasto",
-      },
-      {
-        data: [],
-        color: () => `#7ebab6`, // Turquoise color for budget data
-        label: "Orçado",
-      },
-    ],
-  });
-
-  const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     const loadBudgetsAndTransactions = async () => {
@@ -59,42 +40,12 @@ export default function BudgetScreen() {
     loadBudgetsAndTransactions();
   }, []);
 
-  useEffect(() => {
-    const labels = [];
-    const spentData = [];
-    const budgetData = [];
-
-    budgets.forEach((budget) => {
-      const spentAmount = transactions
-        .filter((transaction) => transaction.category === budget.category)
-        .reduce((acc, transaction) => acc + transaction.amount, 0);
-
-      labels.push(budget.category);
-      spentData.push(spentAmount);
-      budgetData.push(budget.budgetAmount);
-    });
-
-    setData({
-      labels,
-      datasets: [
-        {
-          data: spentData,
-          color: () => `#df4822`, // Red color for spent data
-          label: "Gasto",
-        },
-        {
-          data: budgetData,
-          color: () => `#7ebab6`, // Turquoise color for budget data
-          label: "Orçado",
-        },
-      ],
-    });
-  }, [budgets, transactions]);
+  const generateUniqueId = () => `${Date.now()}`;
 
   const handleAddBudget = async () => {
     if (category && budgetAmount) {
       const newBudget = {
-        id: uuidv4(),
+        id: generateUniqueId(),
         category,
         budgetAmount: parseFloat(budgetAmount),
       };
@@ -122,7 +73,7 @@ export default function BudgetScreen() {
   };
 
   const handleDeleteBudget = async (id) => {
-    const updatedBudgets = budgets.filter(budget => budget.id !== id);
+    const updatedBudgets = budgets.filter((budget) => budget.id !== id);
     setBudgets(updatedBudgets);
 
     try {
@@ -177,47 +128,37 @@ export default function BudgetScreen() {
     );
   };
 
+  const renderPercentageCard = () => {
+    return budgets.map((item) => {
+      const spentAmount = transactions
+        .filter((transaction) => transaction.category === item.category)
+        .reduce((acc, transaction) => acc + transaction.amount, 0);
+      const percentageSpent = ((spentAmount / item.budgetAmount) * 100).toFixed(2);
+
+      return (
+        <View key={item.id} style={styles.percentageCard}>
+          <Text style={styles.percentageCategory}>{item.category}</Text>
+          <Text style={styles.percentageText}>
+            {percentageSpent}% do orçamento gasto
+          </Text>
+        </View>
+      );
+    });
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.cardContainer}>
-          <Text style={styles.budgetsTitle}>Seu Orçamento:</Text>
-          <View style={styles.chartContainer}>
-            <View style={styles.chartCard}>
-              <LineChart
-                data={data}
-                width={screenWidth - 30}
-                height={230}
-                chartConfig={{
-                  backgroundColor: "#fff",
-                  backgroundGradientFrom: "#fff",
-                  backgroundGradientTo: "#fff",
-                  decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  style: {
-                    borderRadius: 16,
-                  },
-                  propsForDots: {
-                    r: "6",
-                    strokeWidth: "2",
-                    stroke: "#ffa726",
-                  },
-                }}
-                bezier
-                style={styles.chart}
-              />
-            </View>
-          </View>
+        <View style={styles.percentageContainer}>
+          {renderPercentageCard()}
         </View>
-
         <View style={styles.budgetsContainer}>
           <Text style={styles.budgetsTitle}>Orçamentos:</Text>
           <FlatList
             data={budgets}
             renderItem={renderBudgetCard}
             keyExtractor={(item) => item.id}
-            numColumns={2} 
+            numColumns={2}
             contentContainerStyle={styles.budgetsGrid}
           />
         </View>
@@ -260,12 +201,21 @@ export default function BudgetScreen() {
             >
               <Picker.Item label="Selecione a Categoria" value="" />
               <Picker.Item label="Alimentação" value="Alimentação" />
+              <Picker.Item label="Renda Fixa" value="Renda Fixa" />
               <Picker.Item label="Transporte" value="Transporte" />
+              <Picker.Item label="Combustivel" value="Combustivel" />
               <Picker.Item label="Moradia" value="Moradia" />
               <Picker.Item label="Lazer" value="Lazer" />
               <Picker.Item label="Educação" value="Educação" />
               <Picker.Item label="Saúde" value="Saúde" />
               <Picker.Item label="Utilidades" value="Utilidades" />
+              <Picker.Item label="Viagens" value="Viagens" />
+              <Picker.Item label="Eventos" value="Eventos" />
+              <Picker.Item label="Presentes" value="Presentes" />
+              <Picker.Item label="Cuidados Pessoais" value="Cuidados Pessoais" />
+              <Picker.Item label="Assinaturas" value="Assinaturas" />
+              <Picker.Item label="Impostos" value="Impostos" />
+              <Picker.Item label="Seguros" value="Seguros" />
             </Picker>
 
             <TextInput
@@ -292,42 +242,19 @@ export default function BudgetScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff", 
+    backgroundColor: "#fff",
   },
   scrollContainer: {
     padding: 10,
-  },
-  cardContainer: {
-    marginBottom: 20,
-  },
-  chartContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  chartCard: {
-    borderRadius: 16,
-    borderColor: "#d4af37", 
-    borderWidth: 1,
-    backgroundColor: "#fff",
-    padding: 10,
-    width: "100%",
-  },
-  chart: {
-    borderRadius: 16,
-  },
-  Title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  budgetsContainer: {
-    marginBottom: 20,
   },
   budgetsTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#284767",
     marginBottom: 10,
+  },
+  budgetsContainer: {
+    marginBottom: 20,
   },
   budgetsGrid: {
     justifyContent: "space-between",
@@ -336,15 +263,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#d4af37", 
+    borderColor: "#d4af37",
     padding: 10,
     margin: 5,
     flex: 1,
-    maxWidth: "48%", 
+    maxWidth: "48%",
     justifyContent: "space-between",
   },
   exceededCard: {
-    borderColor: "#df4822", 
+    borderColor: "#df4822",
   },
   budgetCategory: {
     fontSize: 16,
@@ -356,50 +283,57 @@ const styles = StyleSheet.create({
     color: "#284767",
   },
   budgetOrcado: {
-    color: '#2aad40',
+    color: "#2aad40",
   },
   budgetGasto: {
-    color: "#df4822", 
+    color: "#df4822",
   },
   dontExceedText: {
     color: "green",
     fontWeight: "bold",
   },
   exceededText: {
-    color: "#df4822",
+    color: "red",
     fontWeight: "bold",
   },
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
   },
   editButton: {
-    backgroundColor: '#7ebab6',
-    padding: 10,
+    backgroundColor: "#7ebab6",
     borderRadius: 5,
+    padding: 5,
+    flex: 1,
+    marginRight: 5,
+    alignItems: "center",
   },
   editButtonText: {
     color: "#fff",
+    fontSize: 14,
   },
   deleteButton: {
-    backgroundColor: "#f44336",
-    padding: 10,
+    backgroundColor: "#df4822",
     borderRadius: 5,
+    padding: 5,
+    flex: 1,
+    marginLeft: 5,
+    alignItems: "center",
   },
   deleteButtonText: {
     color: "#fff",
+    fontSize: 14,
   },
   addButton: {
     position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: "#376f7b", 
+    backgroundColor: "#376f7b",
     width: 60,
     height: 60,
     borderRadius: 30,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
   addButtonText: {
     color: "#fff",
@@ -415,49 +349,66 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    width: "80%",
+    width: "90%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#284767",
   },
   closeButton: {
-    backgroundColor: "#e57373",
-    padding: 5,
-    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
   },
   closeButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
+    color: "#df4822",
   },
   picker: {
     height: 50,
     width: "100%",
-    marginBottom: 20,
   },
   input: {
     height: 40,
-    borderColor: "#ccc",
+    borderColor: "#ceceb1",
     borderWidth: 1,
     borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    padding: 10,
+    marginTop: 10,
   },
   saveButton: {
     backgroundColor: "#376f7b",
-    padding: 10,
     borderRadius: 5,
+    padding: 10,
+    marginTop: 10,
+    alignItems: "center",
   },
   saveButtonText: {
     color: "#fff",
     fontSize: 16,
-    textAlign: "center",
+  },
+  percentageContainer: {
+    marginBottom: 20,
+  },
+  percentageCard: {
+    backgroundColor: "#a4d0d0",
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 5,
+    borderColor: "#d4af37",
+    borderWidth: 2,
+  },
+  percentageCategory: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#284767",
+  },
+  percentageText: {
+    fontSize: 14,
+    color: "#284767",
   },
 });
