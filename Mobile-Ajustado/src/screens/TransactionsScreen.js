@@ -23,21 +23,20 @@ const TransactionsScreen = () => {
   const [editMode, setEditMode] = useState(false);
   const [editItem, setEditItem] = useState(null);
 
-  const loadTransactions = async () => {
-    try {
-      const currentUser = await AsyncStorage.getItem("currentUser");
-      if (currentUser) {
-        const savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
-        if (savedTransactions) {
-          setTransactions(JSON.parse(savedTransactions));
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao carregar transações:", error);
-    }
-  };
-
   useEffect(() => {
+    const loadTransactions = async () => {
+      try {
+        const currentUser = await AsyncStorage.getItem("currentUser");
+        if (currentUser) {
+          const savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
+          if (savedTransactions) {
+            setTransactions(JSON.parse(savedTransactions));
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar transações:", error);
+      }
+    };
     loadTransactions();
   }, []);
 
@@ -48,7 +47,7 @@ const TransactionsScreen = () => {
     }
 
     const newTransaction = {
-      id: transactions.length + 1, // Gera um ID simples
+      id: transactions.length + 1,
       amount: parseFloat(amount),
       category,
       description,
@@ -125,9 +124,7 @@ const TransactionsScreen = () => {
   };
 
   const handleDateChange = (text) => {
-    // Remove qualquer caractere não numérico
     const numbers = text.replace(/\D/g, "");
-    // Formata a data como DD/MM/AAAA
     const formattedDate = numbers
       .match(/.{1,2}/g)?.join("/") || "";
     setDate(formattedDate);
@@ -202,7 +199,7 @@ const TransactionsScreen = () => {
               placeholder="Data (DD/MM/AAAA)"
               value={date}
               onChangeText={handleDateChange}
-              maxLength={10} // Limita o comprimento da string para DD/MM/AAAA
+              maxLength={10}
             />
 
             <TextInput
@@ -212,39 +209,12 @@ const TransactionsScreen = () => {
               onChangeText={setDescription}
             />
 
-            <Picker
-              selectedValue={category}
-              style={styles.picker}
-              onValueChange={(itemValue) => setCategory(itemValue)}
-            >
-              <Picker.Item label="Selecione a Categoria" value="" />
-              <Picker.Item label="Alimentação" value="Alimentação" />
-              <Picker.Item label="Renda Fixa" value="Renda Fixa" />
-              <Picker.Item label="Combustivel" value="Combustivel" />
-              <Picker.Item label="Transporte" value="Transporte" />
-              <Picker.Item label="Moradia" value="Moradia" />
-              <Picker.Item label="Lazer" value="Lazer" />
-              <Picker.Item label="Educação" value="Educação" />
-              <Picker.Item label="Saúde" value="Saúde" />
-              <Picker.Item label="Utilidades" value="Utilidades" />
-              <Picker.Item label="Viagens" value="Viagens" />
-              <Picker.Item label="Eventos" value="Eventos" />
-              <Picker.Item label="Presentes" value="Presentes" />
-              <Picker.Item label="Cuidados Pessoais" value="Cuidados Pessoais" />
-              <Picker.Item label="Assinaturas" value="Assinaturas" />
-              <Picker.Item label="Impostos" value="Impostos" />
-              <Picker.Item label="Seguros" value="Seguros" />
-            </Picker>
-
-            <Picker
-              selectedValue={type}
-              style={styles.picker}
-              onValueChange={(itemValue) => setType(itemValue)}
-            >
-              <Picker.Item label="Selecione o Tipo" value="" />
-              <Picker.Item label="Renda" value="renda" />
-              <Picker.Item label="Despesa" value="despesa" />
-            </Picker>
+            <TextInput
+              style={styles.input}
+              placeholder="Categoria"
+              value={category}
+              onChangeText={setCategory}
+            />
 
             <TextInput
               style={styles.input}
@@ -254,14 +224,21 @@ const TransactionsScreen = () => {
               keyboardType="numeric"
             />
 
+            <Picker
+              selectedValue={type}
+              style={styles.picker}
+              onValueChange={(itemValue) => setType(itemValue)}
+            >
+              <Picker.Item label="Renda" value="renda" />
+              <Picker.Item label="Despesa" value="despesa" />
+            </Picker>
+
             <TouchableOpacity
               style={styles.saveButton}
-              onPress={
-                editMode ? handleUpdateTransaction : saveTransaction
-              }
+              onPress={editMode ? handleUpdateTransaction : saveTransaction}
             >
               <Text style={styles.saveButtonText}>
-                {editMode ? "Atualizar" : "Adicionar"}
+                {editMode ? "Atualizar" : "Salvar"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -269,7 +246,7 @@ const TransactionsScreen = () => {
       </Modal>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
