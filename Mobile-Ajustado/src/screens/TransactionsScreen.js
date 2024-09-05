@@ -7,10 +7,10 @@ import {
   FlatList,
   StyleSheet,
   Modal,
-  Picker,
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from '@react-native-picker/picker'; 
 
 const TransactionsScreen = () => {
   const [transactions, setTransactions] = useState([]);
@@ -209,20 +209,29 @@ const TransactionsScreen = () => {
               onChangeText={setDescription}
             />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Categoria"
-              value={category}
-              onChangeText={setCategory}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Valor"
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType="numeric"
-            />
+            <Picker
+              selectedValue={category}
+              style={styles.picker}
+              onValueChange={(itemValue) => setCategory(itemValue)}
+            >
+              <Picker.Item label="Selecione a Categoria" value="" />
+              <Picker.Item label="Alimentação" value="Alimentação" />
+              <Picker.Item label="Renda Fixa" value="Renda Fixa" />
+              <Picker.Item label="Combustivel" value="Combustivel" />
+              <Picker.Item label="Transporte" value="Transporte" />
+              <Picker.Item label="Moradia" value="Moradia" />
+              <Picker.Item label="Lazer" value="Lazer" />
+              <Picker.Item label="Educação" value="Educação" />
+              <Picker.Item label="Saúde" value="Saúde" />
+              <Picker.Item label="Utilidades" value="Utilidades" />
+              <Picker.Item label="Viagens" value="Viagens" />
+              <Picker.Item label="Eventos" value="Eventos" />
+              <Picker.Item label="Presentes" value="Presentes" />
+              <Picker.Item label="Cuidados Pessoais" value="Cuidados Pessoais" />
+              <Picker.Item label="Assinaturas" value="Assinaturas" />
+              <Picker.Item label="Impostos" value="Impostos" />
+              <Picker.Item label="Seguros" value="Seguros" />
+            </Picker>
 
             <Picker
               selectedValue={type}
@@ -232,6 +241,14 @@ const TransactionsScreen = () => {
               <Picker.Item label="Renda" value="renda" />
               <Picker.Item label="Despesa" value="despesa" />
             </Picker>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Valor"
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="numeric"
+            />
 
             <TouchableOpacity
               style={styles.saveButton}
@@ -247,7 +264,6 @@ const TransactionsScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -276,6 +292,9 @@ const styles = StyleSheet.create({
     borderColor: "#d4af37",
     padding: 10,
     marginBottom: 10,
+    marginLeft: 15,
+    width: "90%",
+    marginTop:5,
     elevation: 2,
   },
   transactionDate: {
@@ -372,7 +391,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#d4af37",
   },
-  
+
   saveButton: {
     backgroundColor: "#376f7b",
     borderRadius: 5,

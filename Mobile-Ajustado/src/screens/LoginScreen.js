@@ -7,6 +7,7 @@ import {
   Alert,
   StyleSheet,
   Image,
+  ScrollView, // Import ScrollView
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -19,11 +20,10 @@ const LoginScreen = ({ navigation }) => {
       const usersString = await AsyncStorage.getItem("users");
       const users = usersString ? JSON.parse(usersString) : [];
 
-      // Find user with matching email and password
       const user = users.find(user => user.email === email && user.password === password);
 
       if (user) {
-        await AsyncStorage.setItem("currentUser", email); // Save current user
+        await AsyncStorage.setItem("currentUser", email);
         navigation.navigate("AppTabs");
       } else {
         Alert.alert("Erro", "Email ou senha incorretos!");
@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}> 
       <View style={styles.loginContainer}>
         <View style={styles.logoContainer}>
           <Image source={require("../assets/logomarca.png")} style={styles.logo} />
@@ -72,23 +72,24 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.registerButtonText}>Não tem uma conta? Cadastre-se</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1, 
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f4f4f4",
+    paddingVertical: 20, 
   },
   logoContainer: {
     alignItems: "center",
     marginBottom: 20,
   },
   logo: {
-    width: 130, 
+    width: 130,
     height: 130,
   },
   loginContainer: {

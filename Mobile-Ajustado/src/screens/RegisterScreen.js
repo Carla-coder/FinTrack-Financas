@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   Image,
+  ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -59,54 +60,56 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.registerContainer}>
-        <View style={styles.logoContainer}>
-          <Image source={require("../assets/logomarca.png")} style={styles.logo} />
-        </View>
-        <Text style={styles.title}>Bem-vindo à FinTrack</Text>
-        <Text style={styles.welcomeMessage}>Cadastre-se para gerenciar suas finanças de forma fácil e eficiente!</Text>
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Email:</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Senha:</Text>
-          <View style={styles.inputGroup}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.registerContainer}>
+          <View style={styles.logoContainer}>
+            <Image source={require("../assets/logomarca.png")} style={styles.logo} />
+          </View>
+          <Text style={styles.title}>Bem-vindo à FinTrack</Text>
+          <Text style={styles.welcomeMessage}>Cadastre-se para gerenciar suas finanças de forma fácil e eficiente!</Text>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Email:</Text>
             <TextInput
               style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
-            <TouchableOpacity onPress={togglePasswordVisibility} style={styles.inputGroupText}>
-              <Icon name={showPassword ? "eye" : "eye-slash"} size={20} color="#7ebab6" />
-            </TouchableOpacity>
           </View>
-        </View>
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Confirme a Senha:</Text>
-          <View style={styles.inputGroup}>
-            <TextInput
-              style={styles.input}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!showConfirmPassword}
-            />
-            <TouchableOpacity onPress={toggleConfirmPasswordVisibility} style={styles.inputGroupText}>
-              <Icon name={showConfirmPassword ? "eye" : "eye-slash"} size={20} color="#7ebab6" />
-            </TouchableOpacity>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Senha:</Text>
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity onPress={togglePasswordVisibility} style={styles.inputGroupText}>
+                <Icon name={showPassword ? "eye" : "eye-slash"} size={20} color="#7ebab6" />
+              </TouchableOpacity>
+            </View>
           </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Confirme a Senha:</Text>
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+              />
+              <TouchableOpacity onPress={toggleConfirmPasswordVisibility} style={styles.inputGroupText}>
+                <Icon name={showConfirmPassword ? "eye" : "eye-slash"} size={20} color="#7ebab6" />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Cadastrar</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Cadastrar</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -115,9 +118,12 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f4f4f4",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f4f4",
   },
   logoContainer: {
     alignItems: "center",
