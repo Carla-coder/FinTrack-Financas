@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
   ScrollView,
   Dimensions,
@@ -13,18 +12,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function DashboardScreen({ navigation }) {
   const [transactions, setTransactions] = useState([]);
-  const [menuVisible, setMenuVisible] = useState(false);
   const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
-
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-  };
 
   const loadTransactions = async () => {
     try {
-      const savedTransactions = await AsyncStorage.getItem("transactions");
-      if (savedTransactions !== null) {
-        setTransactions(JSON.parse(savedTransactions));
+      const currentUser = await AsyncStorage.getItem("currentUser");
+      if (currentUser) {
+        const savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
+        if (savedTransactions !== null) {
+          setTransactions(JSON.parse(savedTransactions));
+        }
       }
     } catch (error) {
       console.error("Erro ao carregar transações:", error);
@@ -40,10 +37,10 @@ export default function DashboardScreen({ navigation }) {
       setScreenWidth(Dimensions.get("window").width);
     };
 
-    Dimensions.addEventListener("change", updateLayout);
+    const subscription = Dimensions.addEventListener("change", updateLayout);
 
     return () => {
-      Dimensions.removeEventListener("change", updateLayout);
+      subscription?.remove();
     };
   }, []);
 
@@ -56,38 +53,27 @@ export default function DashboardScreen({ navigation }) {
   }, [navigation]);
 
   const calculateBalanceAndExpenses = () => {
-    let balance = 0;
+    let income = 0;
     let expenses = 0;
 
     transactions.forEach((transaction) => {
       if (transaction.type === "renda") {
-        balance += transaction.amount;
+        income += transaction.amount;
       } else if (transaction.type === "despesa") {
         expenses += transaction.amount;
       }
     });
 
-    balance -= expenses;
-
-    return { balance, expenses };
+    // Considera o saldo como a renda total menos as despesas totais
+    return { balance: income - expenses, expenses };
   };
 
   const { balance, expenses } = calculateBalanceAndExpenses();
 
   const prepareLineChartData = () => {
     const labels = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
+      "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+      "Jul", "Ago", "Set", "Out", "Nov", "Dez"
     ];
     let incomeData = new Array(12).fill(0);
     let expenseData = new Array(12).fill(0);
@@ -106,12 +92,12 @@ export default function DashboardScreen({ navigation }) {
       labels,
       datasets: [
         {
-          data: incomeData.map((value) => (isNaN(value) ? 0 : value)),
+          data: incomeData,
           color: () => `rgba(42, 173, 64, 1)`,
           label: "Renda",
         },
         {
-          data: expenseData.map((value) => (isNaN(value) ? 0 : value)),
+          data: expenseData,
           color: () => `rgba(223, 72, 34, 1)`,
           label: "Despesas",
         },
@@ -139,7 +125,6 @@ export default function DashboardScreen({ navigation }) {
       color: colors[index % colors.length],
       legendFontColor: "#284767",
       legendFontSize: 12,
-      label: `R$ ${categoryTotals[category].toFixed(2)}`,
     }));
   };
 
@@ -158,21 +143,15 @@ export default function DashboardScreen({ navigation }) {
     </View>
   );
 
+  const keyExtractor = (item) => item.id ? item.id.toString() : Math.random().toString();
+
+  // Filtrar as últimas 3 transações, excluindo "renda"
+  const filteredTransactions = transactions
+    .filter(transaction => transaction.type !== 'renda')
+    .slice(-3);
+
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
-      {menuVisible && (
-        <View style={styles.menuContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Transactions")}>
-            <Text style={styles.menuItem}>Transações</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Budgets")}>
-            <Text style={styles.menuItem}>Orçamentos</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Reports")}>
-            <Text style={styles.menuItem}>Relatórios</Text>
-          </TouchableOpacity>
-        </View>
-      )}
 
       <View style={styles.balanceContainer}>
         <View style={styles.card}>
@@ -180,10 +159,10 @@ export default function DashboardScreen({ navigation }) {
           <Text
             style={[
               styles.balance,
-              { color: balance >= 0 ? "#2aad40" : "#df4822" },
+              { color: balance < 0 ? "#df4822" : "#2aad40" },
             ]}
           >
-            R$ {balance.toFixed(2)}
+            R$ {balance < 0 ? balance.toFixed(2) : balance.toFixed(2)}
           </Text>
         </View>
         <View style={styles.card}>
@@ -207,9 +186,12 @@ export default function DashboardScreen({ navigation }) {
               backgroundGradientTo: "#fff",
               decimalPlaces: 2,
               color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             }}
             style={styles.chart}
             bezier
+            yAxisLabel=""
+            yAxisSuffix=" R$"
           />
         </View>
 
@@ -226,10 +208,11 @@ export default function DashboardScreen({ navigation }) {
                 backgroundGradientTo: "#fff",
                 decimalPlaces: 2,
                 color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               }}
               accessor="amount"
               backgroundColor="transparent"
-              paddingLeft="5"
+              paddingLeft="15"
               style={styles.chart}
               absolute
             />
@@ -238,19 +221,19 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       <View style={styles.transactionsContainer}>
-      <Text style={styles.transactionsTitle}>Últimas Transações:</Text>
-      <View style={styles.transactionHeader}>
-        <Text style={styles.transactionHeaderText}>Data</Text>
-        <Text style={styles.transactionHeaderText}>Descrição</Text>
-        <Text style={styles.transactionHeaderText}>Valor</Text>
+        <Text style={styles.transactionsTitle}>Últimas Transações:</Text>
+        <View style={styles.transactionHeader}>
+          <Text style={styles.transactionHeaderText}>Data</Text>
+          <Text style={styles.transactionHeaderText}>Descrição</Text>
+          <Text style={styles.transactionHeaderText}>Valor</Text>
+        </View>
+        <FlatList
+          data={filteredTransactions}  
+          renderItem={renderTransactionItem}
+          keyExtractor={keyExtractor}
+        />
       </View>
-      <FlatList
-        data={transactions.filter(transaction => transaction.type === "despesa").slice(-3)}
-        renderItem={renderTransactionItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
-    </View>
-  </ScrollView>
+    </ScrollView>
   );
 }
 

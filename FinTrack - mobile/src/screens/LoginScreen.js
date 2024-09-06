@@ -7,6 +7,7 @@ import {
   Alert,
   StyleSheet,
   Image,
+  ScrollView, // Import ScrollView
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -16,47 +17,37 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      console.log("Tentando login:", email, password); 
-      const storedEmail = await AsyncStorage.getItem("userEmail");
-      const storedPassword = await AsyncStorage.getItem("userPassword");
+      const usersString = await AsyncStorage.getItem("users");
+      const users = usersString ? JSON.parse(usersString) : [];
 
-      console.log("Email armazenado:", storedEmail); 
-      console.log("Senha armazenada:", storedPassword); 
+      const user = users.find(user => user.email === email && user.password === password);
 
-      if (!storedEmail || !storedPassword) {
-        Alert.alert("Erro", "Você precisa se cadastrar primeiro!");
-        return;
-      }
-
-      if (email === storedEmail && password === storedPassword) {
-        Alert.alert("Sucesso", "Login realizado com sucesso!");
-        navigation.navigate("AppTabs"); 
+      if (user) {
+        await AsyncStorage.setItem("currentUser", email);
+        navigation.navigate("AppTabs");
       } else {
         Alert.alert("Erro", "Email ou senha incorretos!");
       }
     } catch (error) {
-      console.error("Erro ao fazer login:", error); 
       Alert.alert("Erro", "Ocorreu um erro ao fazer login.");
     }
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}> 
       <View style={styles.loginContainer}>
         <View style={styles.logoContainer}>
           <Image source={require("../assets/logomarca.png")} style={styles.logo} />
         </View>
         <Text style={styles.title}>Faça seu login</Text>
-        <Text style={styles.welcomeMessage}>
-          Entre e gerencie suas finanças de forma fácil e eficiente!
-        </Text>
+        <Text style={styles.welcomeMessage}>Entre e gerencie suas finanças de forma fácil e eficiente!</Text>
         <View style={styles.formGroup}>
           <Text style={styles.label}>Email:</Text>
           <TextInput
             style={styles.input}
             placeholder="Digite seu email"
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -67,7 +58,7 @@ const LoginScreen = ({ navigation }) => {
             style={styles.input}
             placeholder="Digite sua senha"
             value={password}
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={setPassword}
             secureTextEntry
           />
         </View>
@@ -78,28 +69,27 @@ const LoginScreen = ({ navigation }) => {
           style={styles.registerButton}
           onPress={() => navigation.navigate("Cadastro")}
         >
-          <Text style={styles.registerButtonText}>
-            Não tem uma conta? Cadastre-se
-          </Text>
+          <Text style={styles.registerButtonText}>Não tem uma conta? Cadastre-se</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1, 
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f4f4f4",
+    paddingVertical: 20, 
   },
   logoContainer: {
     alignItems: "center",
     marginBottom: 20,
   },
   logo: {
-    width: 130, 
+    width: 130,
     height: 130,
   },
   loginContainer: {

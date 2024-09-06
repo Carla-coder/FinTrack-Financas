@@ -1,188 +1,184 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
   StyleSheet,
   Modal,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
+  Alert,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from '@react-native-picker/picker'; 
 
-export default function TransactionsScreen() {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
-  const [category, setCategory] = useState("");
-  const [type, setType] = useState("");
+const TransactionsScreen = () => {
   const [transactions, setTransactions] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [type, setType] = useState("renda");
+  const [date, setDate] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editItem, setEditItem] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const loadTransactions = async () => {
       try {
-        const savedTransactions = await AsyncStorage.getItem("transactions");
-        if (savedTransactions !== null) {
-          setTransactions(JSON.parse(savedTransactions));
+        const currentUser = await AsyncStorage.getItem("currentUser");
+        if (currentUser) {
+          const savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
+          if (savedTransactions) {
+            setTransactions(JSON.parse(savedTransactions));
+          }
         }
       } catch (error) {
         console.error("Erro ao carregar transações:", error);
       }
     };
-
     loadTransactions();
   }, []);
 
-  const handleAddTransaction = async () => {
-    if (description && amount && date && category && type) {
-      const newTransaction = {
-        id: transactions.length + 1,
-        description,
-        amount: parseFloat(amount),
-        date,
-        category,
-        type,
-      };
+  const saveTransaction = async () => {
+    if (!amount || !description || !category || !date) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos.");
+      return;
+    }
 
-      const updatedTransactions = [...transactions, newTransaction];
-      setTransactions(updatedTransactions);
+    const newTransaction = {
+      id: transactions.length + 1,
+      amount: parseFloat(amount),
+      category,
+      description,
+      type,
+      date,
+    };
 
-      try {
-        await AsyncStorage.setItem(
-          "transactions",
-          JSON.stringify(updatedTransactions)
-        );
-      } catch (error) {
-        console.error("Erro ao salvar transações:", error);
+    try {
+      const currentUser = await AsyncStorage.getItem("currentUser");
+      if (currentUser) {
+        let savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
+        savedTransactions = savedTransactions ? JSON.parse(savedTransactions) : [];
+        savedTransactions.push(newTransaction);
+        await AsyncStorage.setItem(`transactions_${currentUser}`, JSON.stringify(savedTransactions));
+        setTransactions(savedTransactions);
+        resetModal();
       }
-
-      setDescription("");
-      setAmount("");
-      setDate("");
-      setCategory("");
-      setType("");
-      setModalVisible(false);
-    } else {
-      alert("Por favor, preencha todos os campos.");
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao salvar a transação.");
     }
   };
 
   const handleEditTransaction = (item) => {
     setEditItem(item);
-    setDescription(item.description);
     setAmount(item.amount.toString());
-    setDate(item.date);
+    setDescription(item.description);
     setCategory(item.category);
+    setDate(item.date);
     setType(item.type);
     setEditMode(true);
-    setModalVisible(true);
+    setShowModal(true);
   };
 
   const handleUpdateTransaction = async () => {
-    if (editItem && description && amount && date && category && type) {
-      const updatedTransaction = {
-        ...editItem,
-        description,
-        amount: parseFloat(amount),
-        date,
-        category,
-        type,
-      };
+    if (!amount || !description || !category || !date) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos.");
+      return;
+    }
 
-      const updatedTransactions = transactions.map((item) =>
-        item.id === editItem.id ? updatedTransaction : item
-      );
+    const updatedTransaction = {
+      ...editItem,
+      amount: parseFloat(amount),
+      category,
+      description,
+      type,
+      date,
+    };
 
-      setTransactions(updatedTransactions);
-
-      try {
-        await AsyncStorage.setItem(
-          "transactions",
-          JSON.stringify(updatedTransactions)
+    try {
+      const currentUser = await AsyncStorage.getItem("currentUser");
+      if (currentUser) {
+        let savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
+        savedTransactions = savedTransactions ? JSON.parse(savedTransactions) : [];
+        const updatedTransactions = savedTransactions.map((item) =>
+          item.id === editItem.id ? updatedTransaction : item
         );
-      } catch (error) {
-        console.error("Erro ao salvar transações:", error);
+        await AsyncStorage.setItem(`transactions_${currentUser}`, JSON.stringify(updatedTransactions));
+        setTransactions(updatedTransactions);
+        resetModal();
       }
-
-      setEditItem(null);
-      setEditMode(false);
-      setDescription("");
-      setAmount("");
-      setDate("");
-      setCategory("");
-      setType("");
-      setModalVisible(false);
-    } else {
-      alert("Por favor, preencha todos os campos.");
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao atualizar a transação.");
     }
   };
 
-  const formatDate = (text) => {
+  const resetModal = () => {
+    setEditItem(null);
+    setEditMode(false);
+    setShowModal(false);
+    setAmount("");
+    setDescription("");
+    setCategory("");
+    setDate("");
+  };
+
+  const handleDateChange = (text) => {
     const numbers = text.replace(/\D/g, "");
-    let formattedDate = "";
-
-    if (numbers.length > 0) {
-      formattedDate += numbers.slice(0, 2);
-    }
-    if (numbers.length >= 3) {
-      formattedDate += "/" + numbers.slice(2, 4);
-    }
-    if (numbers.length >= 5) {
-      formattedDate += "/" + numbers.slice(4, 8);
-    }
-
+    const formattedDate = numbers
+      .match(/.{1,2}/g)?.join("/") || "";
     setDate(formattedDate);
   };
 
+  const renderTransaction = ({ item }) => (
+    <View style={styles.transactionCard}>
+      <Text style={styles.transactionDate}>{item.date}</Text>
+      <Text style={styles.transactionDescription}>
+        {item.description} - {item.category}
+      </Text>
+      <Text
+        style={[
+          styles.transactionAmount,
+          { color: item.type === "renda" ? "#2aad40" : "#df4822" },
+        ]}
+      >
+        {item.type === "renda"
+          ? `+ R$ ${item.amount.toFixed(2)}`
+          : `- R$ ${item.amount.toFixed(2)}`}
+      </Text>
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={() => handleEditTransaction(item)}
+      >
+        <Text style={styles.editButtonText}>✎</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.transactionsContainer}>
-          <Text style={styles.transactionsTitle}>Suas Transações:</Text>
-          {transactions.map((item) => (
-            <View key={item.id} style={styles.transactionCard}>
-              <Text style={styles.transactionDate}>{item.date}</Text>
-              <Text style={styles.transactionDescription}>{item.description} - {item.category}</Text>
-              <Text
-                style={[
-                  styles.transactionAmount,
-                  { color: item.type === "renda" ? "#2aad40" : "#df4822" },
-                ]}
-              >
-                {item.type === "renda"
-                  ? `+ R$ ${item.amount.toFixed(2)}`
-                  : `- R$ ${item.amount.toFixed(2)}`}
-              </Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => handleEditTransaction(item)}
-              >
-                <Text style={styles.editButtonText}>✎</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
+      <FlatList
+        data={transactions}
+        renderItem={renderTransaction}
+        keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
+        ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma transação encontrada.</Text>}
+      />
 
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => {
           setEditMode(false);
-          setModalVisible(true);
+          setShowModal(true);
         }}
       >
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
 
       <Modal
+        visible={showModal}
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={resetModal}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -192,7 +188,7 @@ export default function TransactionsScreen() {
               </Text>
               <TouchableOpacity
                 style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
+                onPress={resetModal}
               >
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
@@ -202,7 +198,8 @@ export default function TransactionsScreen() {
               style={styles.input}
               placeholder="Data (DD/MM/AAAA)"
               value={date}
-              onChangeText={formatDate}
+              onChangeText={handleDateChange}
+              maxLength={10}
             />
 
             <TextInput
@@ -220,6 +217,7 @@ export default function TransactionsScreen() {
               <Picker.Item label="Selecione a Categoria" value="" />
               <Picker.Item label="Alimentação" value="Alimentação" />
               <Picker.Item label="Renda Fixa" value="Renda Fixa" />
+              <Picker.Item label="Combustivel" value="Combustivel" />
               <Picker.Item label="Transporte" value="Transporte" />
               <Picker.Item label="Moradia" value="Moradia" />
               <Picker.Item label="Lazer" value="Lazer" />
@@ -240,7 +238,6 @@ export default function TransactionsScreen() {
               style={styles.picker}
               onValueChange={(itemValue) => setType(itemValue)}
             >
-              <Picker.Item label="Selecione o Tipo" value="" />
               <Picker.Item label="Renda" value="renda" />
               <Picker.Item label="Despesa" value="despesa" />
             </Picker>
@@ -255,12 +252,10 @@ export default function TransactionsScreen() {
 
             <TouchableOpacity
               style={styles.saveButton}
-              onPress={
-                editMode ? handleUpdateTransaction : handleAddTransaction
-              }
+              onPress={editMode ? handleUpdateTransaction : saveTransaction}
             >
               <Text style={styles.saveButtonText}>
-                {editMode ? "Atualizar" : "Adicionar"}
+                {editMode ? "Atualizar" : "Salvar"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -268,8 +263,7 @@ export default function TransactionsScreen() {
       </Modal>
     </View>
   );
-}
-
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -298,6 +292,9 @@ const styles = StyleSheet.create({
     borderColor: "#d4af37",
     padding: 10,
     marginBottom: 10,
+    marginLeft: 15,
+    width: "90%",
+    marginTop:5,
     elevation: 2,
   },
   transactionDate: {
@@ -394,7 +391,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#d4af37",
   },
-  
+
   saveButton: {
     backgroundColor: "#376f7b",
     borderRadius: 5,
@@ -407,3 +404,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+export default TransactionsScreen;

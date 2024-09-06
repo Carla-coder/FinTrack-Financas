@@ -10,8 +10,8 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from '@react-native-picker/picker';
 
 export default function BudgetScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -21,65 +21,74 @@ export default function BudgetScreen() {
   const [transactions, setTransactions] = useState([]);
   const [editingBudget, setEditingBudget] = useState(null);
 
-  useEffect(() => {
-    const loadBudgetsAndTransactions = async () => {
-      try {
-        const savedBudgets = await AsyncStorage.getItem("budgets");
+  const loadUserData = async () => {
+    try {
+      const currentUser = await AsyncStorage.getItem("currentUser");
+      if (currentUser) {
+        const savedBudgets = await AsyncStorage.getItem(`budgets_${currentUser}`);
         if (savedBudgets !== null) {
           setBudgets(JSON.parse(savedBudgets));
         }
-        const savedTransactions = await AsyncStorage.getItem("transactions");
+        const savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
         if (savedTransactions !== null) {
           setTransactions(JSON.parse(savedTransactions));
         }
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
       }
-    };
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+    }
+  };
 
-    loadBudgetsAndTransactions();
+  useEffect(() => {
+    loadUserData();
   }, []);
 
   const generateUniqueId = () => `${Date.now()}`;
 
   const handleAddBudget = async () => {
     if (category && budgetAmount) {
-      const newBudget = {
-        id: generateUniqueId(),
-        category,
-        budgetAmount: parseFloat(budgetAmount),
-      };
+      const currentUser = await AsyncStorage.getItem("currentUser");
+      if (currentUser) {
+        const newBudget = {
+          id: generateUniqueId(),
+          category,
+          budgetAmount: parseFloat(budgetAmount),
+        };
 
-      const updatedBudgets = editingBudget
-        ? budgets.map((budget) =>
-            budget.id === editingBudget.id ? newBudget : budget
-          )
-        : [...budgets, newBudget];
-      setBudgets(updatedBudgets);
+        const updatedBudgets = editingBudget
+          ? budgets.map((budget) =>
+              budget.id === editingBudget.id ? newBudget : budget
+            )
+          : [...budgets, newBudget];
+        setBudgets(updatedBudgets);
 
-      try {
-        await AsyncStorage.setItem("budgets", JSON.stringify(updatedBudgets));
-      } catch (error) {
-        console.error("Erro ao salvar orçamentos:", error);
+        try {
+          await AsyncStorage.setItem(`budgets_${currentUser}`, JSON.stringify(updatedBudgets));
+        } catch (error) {
+          console.error("Erro ao salvar orçamentos:", error);
+        }
+
+        setCategory("");
+        setBudgetAmount("");
+        setEditingBudget(null);
+        setModalVisible(false);
       }
-
-      setCategory("");
-      setBudgetAmount("");
-      setEditingBudget(null);
-      setModalVisible(false);
     } else {
       alert("Por favor, preencha todos os campos.");
     }
   };
 
   const handleDeleteBudget = async (id) => {
-    const updatedBudgets = budgets.filter((budget) => budget.id !== id);
-    setBudgets(updatedBudgets);
+    const currentUser = await AsyncStorage.getItem("currentUser");
+    if (currentUser) {
+      const updatedBudgets = budgets.filter((budget) => budget.id !== id);
+      setBudgets(updatedBudgets);
 
-    try {
-      await AsyncStorage.setItem("budgets", JSON.stringify(updatedBudgets));
-    } catch (error) {
-      console.error("Erro ao excluir orçamento:", error);
+      try {
+        await AsyncStorage.setItem(`budgets_${currentUser}`, JSON.stringify(updatedBudgets));
+      } catch (error) {
+        console.error("Erro ao excluir orçamento:", error);
+      }
     }
   };
 
@@ -95,6 +104,7 @@ export default function BudgetScreen() {
       .filter((transaction) => transaction.category === item.category)
       .reduce((acc, transaction) => acc + transaction.amount, 0);
     const isExceeded = spentAmount > item.budgetAmount;
+    const percentageSpent = ((spentAmount / item.budgetAmount) * 100).toFixed(2);
 
     return (
       <View style={[styles.budgetCard, isExceeded && styles.exceededCard]}>
@@ -184,16 +194,15 @@ export default function BudgetScreen() {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Adicionar Orçamento</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.closeButtonText}>X</Text>
-              </TouchableOpacity>
-            </View>
-
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>
+              {editingBudget ? "Editar Orçamento" : "Adicionar Orçamento"}
+            </Text>
             <Picker
               selectedValue={category}
               style={styles.picker}
@@ -201,22 +210,29 @@ export default function BudgetScreen() {
             >
               <Picker.Item label="Selecione a Categoria" value="" />
               <Picker.Item label="Alimentação" value="Alimentação" />
+              <Picker.Item label="Renda Fixa" value="Renda Fixa" />
+              <Picker.Item label="Combustivel" value="Combustivel" />
               <Picker.Item label="Transporte" value="Transporte" />
               <Picker.Item label="Moradia" value="Moradia" />
               <Picker.Item label="Lazer" value="Lazer" />
               <Picker.Item label="Educação" value="Educação" />
               <Picker.Item label="Saúde" value="Saúde" />
               <Picker.Item label="Utilidades" value="Utilidades" />
+              <Picker.Item label="Viagens" value="Viagens" />
+              <Picker.Item label="Eventos" value="Eventos" />
+              <Picker.Item label="Presentes" value="Presentes" />
+              <Picker.Item label="Cuidados Pessoais" value="Cuidados Pessoais" />
+              <Picker.Item label="Assinaturas" value="Assinaturas" />
+              <Picker.Item label="Impostos" value="Impostos" />
+              <Picker.Item label="Seguros" value="Seguros" />
             </Picker>
-
             <TextInput
               style={styles.input}
               placeholder="Valor do Orçamento"
               keyboardType="numeric"
               value={budgetAmount}
-              onChangeText={(text) => setBudgetAmount(text)}
+              onChangeText={setBudgetAmount}
             />
-
             <TouchableOpacity
               style={styles.saveButton}
               onPress={handleAddBudget}
@@ -397,6 +413,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#284767",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: "#df4822",
   },
   percentageText: {
     fontSize: 14,

@@ -7,7 +7,7 @@
     "icon": "./assets/logomarca.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/logomarca.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,14 +19,14 @@
         "foregroundImage": "./assets/logomarca.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ledev.fintrack"
+      "package": "com.leticiadev.fintrack"
     },
     "web": {
       "favicon": "./assets/logomarca.png"
     },
     "extra": {
       "eas": {
-        "projectId": "b07f749e-61c3-4ed8-9a03-c5f9c5c41c4c"
+        "projectId": "755abaa7-f9e5-43da-997d-1cc439d4cfb7"
       }
     }
   }
