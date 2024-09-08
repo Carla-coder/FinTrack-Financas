@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal, Text, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -25,14 +25,28 @@ function AppTabs() {
   const [type, setType] = useState('');
   const [amount, setAmount] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [editItem, setEditItem] = useState(null);
 
   const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const closeModal = () => {
+    resetModal();
+    setShowModal(false);
+  };
+
+  const resetModal = () => {
+    setDate('');
+    setDescription('');
+    setCategory('');
+    setType('');
+    setAmount('');
+    setEditMode(false);
+    setEditItem(null);
+  };
 
   const handleDateChange = (text) => {
     const numbers = text.replace(/\D/g, "");
-    const formattedDate = numbers
-      .match(/.{1,2}/g)?.join("/") || "";
+    const formattedDate = numbers.match(/.{1,2}/g)?.join("/") || "";
     setDate(formattedDate);
   };
 
@@ -43,6 +57,7 @@ function AppTabs() {
     }
 
     const newTransaction = {
+      id: editMode ? editItem.id : transactions.length + 1,
       date,
       description,
       category,
@@ -55,10 +70,18 @@ function AppTabs() {
       if (currentUser) {
         let savedTransactions = await AsyncStorage.getItem(`transactions_${currentUser}`);
         savedTransactions = savedTransactions ? JSON.parse(savedTransactions) : [];
-        savedTransactions.push(newTransaction);
-        await AsyncStorage.setItem(`transactions_${currentUser}`, JSON.stringify(savedTransactions));
 
-        setTransactions([...savedTransactions]);
+        if (editMode) {
+          const updatedTransactions = savedTransactions.map((transaction) =>
+            transaction.id === editItem.id ? newTransaction : transaction
+          );
+          await AsyncStorage.setItem(`transactions_${currentUser}`, JSON.stringify(updatedTransactions));
+          setTransactions(updatedTransactions);
+        } else {
+          savedTransactions.push(newTransaction);
+          await AsyncStorage.setItem(`transactions_${currentUser}`, JSON.stringify(savedTransactions));
+          setTransactions(savedTransactions);
+        }
         closeModal();
       }
     } catch (error) {
@@ -66,82 +89,89 @@ function AppTabs() {
     }
   };
 
+  const handleEditTransaction = (item) => {
+    setEditItem(item);
+    setDate(item.date);
+    setDescription(item.description);
+    setCategory(item.category);
+    setType(item.type);
+    setAmount(item.amount.toString());
+    setEditMode(true);
+    openModal();
+  };
+
   return (
     <>
       <Tab.Navigator
-  screenOptions={({ route }) => ({
-    tabBarIcon: ({ color, size }) => {
-      let iconName;
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
+            if (route.name === "Dashboard") {
+              iconName = "home";
+            } else if (route.name === "Transações") {
+              iconName = "list";
+            } else if (route.name === "Orçamentos") {
+              iconName = "wallet";
+            } else if (route.name === "Relatórios") {
+              iconName = "analytics";
+            }
 
-      if (route.name === "Dashboard") {
-        iconName = "home";
-      } else if (route.name === "Transações") {
-        iconName = "list";
-      } else if (route.name === "Orçamentos") {
-        iconName = "wallet";
-      } else if (route.name === "Relatórios") {
-        iconName = "analytics";
-      }
-
-      return (
-        <View style={styles.iconContainer}>
-          <Ionicons name={iconName} size={size} color={color} />
-        </View>
-      );
-    },
-    tabBarStyle: {
-      backgroundColor: "#376f7b",
-      height:55,
-    },
-    tabBarActiveTintColor: "#ffffff",
-    tabBarInactiveTintColor: "#ffffff",
-    tabBarLabelStyle: {
-      fontSize: 12,
-    },
-  })}
->
-  <Tab.Screen name="Dashboard" component={DashboardScreen} />
-  <Tab.Screen
-    name="Transações"
-    component={() => <TransactionsScreen transactions={transactions} />}
-  />
-  <Tab.Screen
-    name="Add"
-    component={() => null}
-    listeners={{
-      tabPress: (e) => {
-        e.preventDefault();
-        openModal();
-      },
-    }}
-    options={{
-      tabBarIcon: ({ size }) => (
-        <View style={styles.addButton}>
-          <Ionicons name="add" size={size} color="#376f7b" />
-        </View>
-      ),
-      tabBarLabel: () => null, 
-      tabBarButton: (props) => <TouchableOpacity {...props} style={styles.addTabButton} />
-    }}
-  />
-  <Tab.Screen name="Orçamentos" component={BudgetsScreen} />
-  <Tab.Screen name="Relatórios" component={ReportsScreen} />
-</Tab.Navigator>
-
-      <Modal
-        visible={showModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={closeModal}
+            return (
+              <View style={styles.iconContainer}>
+                <Ionicons name={iconName} size={size} color={color} />
+              </View>
+            );
+          },
+          tabBarStyle: {
+            backgroundColor: "#376f7b",
+            height: 55,
+          },
+          tabBarActiveTintColor: "#ffffff",
+          tabBarInactiveTintColor: "#ffffff",
+          tabBarLabelStyle: {
+            fontSize: 12,
+          },
+        })}
       >
+        <Tab.Screen name="Dashboard" component={DashboardScreen} />
+        <Tab.Screen
+          name="Transações"
+          component={() => (
+            <TransactionsScreen
+              transactions={transactions}
+              onEditTransaction={handleEditTransaction}
+            />
+          )}
+        />
+        <Tab.Screen
+          name="Add"
+          component={() => null}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              openModal();
+            },
+          }}
+          options={{
+            tabBarIcon: ({ size }) => (
+              <View style={styles.addButton}>
+                <Ionicons name="add" size={size} color="#376f7b" />
+              </View>
+            ),
+            tabBarLabel: () => null,
+            tabBarButton: (props) => <TouchableOpacity {...props} style={styles.addTabButton} />,
+          }}
+        />
+        <Tab.Screen name="Orçamentos" component={BudgetsScreen} />
+        <Tab.Screen name="Relatórios" component={ReportsScreen} />
+      </Tab.Navigator>
+
+      <Modal visible={showModal} animationType="slide" transparent={true} onRequestClose={closeModal}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Adicionar Transação</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={closeModal}
-              >
+              <Text style={styles.modalTitle}>{editMode ? "Editar Transação" : "Adicionar Transação"}</Text>
+              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
             </View>
@@ -158,12 +188,8 @@ function AppTabs() {
               value={description}
               onChangeText={setDescription}
             />
-            <Picker
-              selectedValue={category}
-              style={styles.picker}
-              onValueChange={(itemValue) => setCategory(itemValue)}
-            >
-              <Picker.Item label="Selecione a Categoria" value="" />
+            <Picker selectedValue={category} style={styles.picker} onValueChange={(itemValue) => setCategory(itemValue)}>
+            <Picker.Item label="Selecione a Categoria" value="" />
               <Picker.Item label="Alimentação" value="Alimentação" />
               <Picker.Item label="Renda Fixa" value="Renda Fixa" />
               <Picker.Item label="Combustivel" value="Combustivel" />
@@ -181,11 +207,7 @@ function AppTabs() {
               <Picker.Item label="Impostos" value="Impostos" />
               <Picker.Item label="Seguros" value="Seguros" />
             </Picker>
-            <Picker
-              selectedValue={type}
-              style={styles.picker}
-              onValueChange={(itemValue) => setType(itemValue)}
-            >
+            <Picker selectedValue={type} style={styles.picker} onValueChange={(itemValue) => setType(itemValue)}>
               <Picker.Item label="Renda" value="renda" />
               <Picker.Item label="Despesa" value="despesa" />
             </Picker>
@@ -196,10 +218,7 @@ function AppTabs() {
               onChangeText={setAmount}
               keyboardType="numeric"
             />
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={saveTransaction}
-            >
+            <TouchableOpacity style={styles.saveButton} onPress={saveTransaction}>
               <Text style={styles.saveButtonText}>Salvar</Text>
             </TouchableOpacity>
           </View>
@@ -208,7 +227,6 @@ function AppTabs() {
     </>
   );
 }
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,

@@ -46,11 +46,12 @@ export default function DashboardScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      loadTransactions();
+      loadTransactions(); 
     });
-
+  
     return unsubscribe;
   }, [navigation]);
+  
 
   const calculateBalanceAndExpenses = () => {
     let income = 0;
