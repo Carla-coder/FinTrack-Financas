@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  Dimensions,
   FlatList,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from '@react-native-picker/picker';
+import { useFocusEffect } from '@react-navigation/native'; // Importa o hook
 
 export default function BudgetScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -21,7 +21,7 @@ export default function BudgetScreen() {
   const [transactions, setTransactions] = useState([]);
   const [editingBudget, setEditingBudget] = useState(null);
 
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     try {
       const currentUser = await AsyncStorage.getItem("currentUser");
       if (currentUser) {
@@ -37,11 +37,37 @@ export default function BudgetScreen() {
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     }
-  };
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [loadUserData])
+  );
 
   useEffect(() => {
-    loadUserData();
-  }, []);
+    const recalculateBudgets = async () => {
+      const currentUser = await AsyncStorage.getItem("currentUser");
+      if (currentUser) {
+        const savedBudgets = await AsyncStorage.getItem(`budgets_${currentUser}`);
+        if (savedBudgets !== null) {
+          const updatedBudgets = JSON.parse(savedBudgets).map((budget) => {
+            const spentAmount = transactions
+              .filter((transaction) => transaction.category === budget.category)
+              .reduce((acc, transaction) => acc + transaction.amount, 0);
+            return {
+              ...budget,
+              spentAmount,
+              isExceeded: spentAmount > budget.budgetAmount,
+              percentageSpent: ((spentAmount / budget.budgetAmount) * 100).toFixed(2),
+            };
+          });
+          setBudgets(updatedBudgets);
+        }
+      }
+    };
+    recalculateBudgets();
+  }, [transactions]);
 
   const generateUniqueId = () => `${Date.now()}`;
 
@@ -53,6 +79,9 @@ export default function BudgetScreen() {
           id: generateUniqueId(),
           category,
           budgetAmount: parseFloat(budgetAmount),
+          spentAmount: 0,
+          isExceeded: false,
+          percentageSpent: "0.00",
         };
 
         const updatedBudgets = editingBudget
@@ -99,69 +128,40 @@ export default function BudgetScreen() {
     setModalVisible(true);
   };
 
-  const renderBudgetCard = ({ item }) => {
-    const spentAmount = transactions
-      .filter((transaction) => transaction.category === item.category)
-      .reduce((acc, transaction) => acc + transaction.amount, 0);
-    const isExceeded = spentAmount > item.budgetAmount;
-    const percentageSpent = ((spentAmount / item.budgetAmount) * 100).toFixed(2);
-
-    return (
-      <View style={[styles.budgetCard, isExceeded && styles.exceededCard]}>
-        <Text style={styles.budgetCategory}>{item.category}</Text>
-        <Text style={[styles.budgetDetails]}>
-          Orçado: <Text style={styles.budgetOrcado}>+ R${item.budgetAmount.toFixed(2)}</Text>
-        </Text>
-        <Text style={[styles.budgetDetails]}>
-          Gasto: <Text style={styles.budgetGasto}>- R${spentAmount.toFixed(2)}</Text>
-        </Text>
-        {!isExceeded ? (
-          <Text style={styles.dontExceedText}>Adequado</Text>
-        ) : (
-          <Text style={styles.exceededText}>Excedido</Text>
-        )}
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => handleEditBudget(item)}
-          >
-            <Text style={styles.editButtonText}>Editar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => handleDeleteBudget(item.id)}
-          >
-            <Text style={styles.deleteButtonText}>Excluir</Text>
-          </TouchableOpacity>
-        </View>
+  const renderBudgetCard = ({ item }) => (
+    <View style={[styles.budgetCard, item.isExceeded && styles.exceededCard]}>
+      <Text style={styles.budgetCategory}>{item.category}</Text>
+      <Text style={styles.budgetDetails}>
+        Orçado: <Text style={styles.budgetOrcado}>+ R${item.budgetAmount.toFixed(2)}</Text>
+      </Text>
+      <Text style={styles.budgetDetails}>
+        Gasto: <Text style={styles.budgetGasto}>- R${item.spentAmount.toFixed(2)}</Text>
+      </Text>
+      {!item.isExceeded ? (
+        <Text style={styles.dontExceedText}>Adequado</Text>
+      ) : (
+        <Text style={styles.exceededText}>Excedido</Text>
+      )}
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => handleEditBudget(item)}
+        >
+          <Text style={styles.editButtonText}>Editar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDeleteBudget(item.id)}
+        >
+          <Text style={styles.deleteButtonText}>Excluir</Text>
+        </TouchableOpacity>
       </View>
-    );
-  };
-
-  const renderPercentageCard = () => {
-    return budgets.map((item) => {
-      const spentAmount = transactions
-        .filter((transaction) => transaction.category === item.category)
-        .reduce((acc, transaction) => acc + transaction.amount, 0);
-      const percentageSpent = ((spentAmount / item.budgetAmount) * 100).toFixed(2);
-
-      return (
-        <View key={item.id} style={styles.percentageCard}>
-          <Text style={styles.percentageCategory}>{item.category}</Text>
-          <Text style={styles.percentageText}>
-            {percentageSpent}% do orçamento gasto
-          </Text>
-        </View>
-      );
-    });
-  };
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.percentageContainer}>
-          {renderPercentageCard()}
-        </View>
         <View style={styles.budgetsContainer}>
           <Text style={styles.budgetsTitle}>Orçamentos:</Text>
           <FlatList
@@ -245,6 +245,8 @@ export default function BudgetScreen() {
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

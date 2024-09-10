@@ -226,26 +226,42 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: "80%",
-    backgroundColor: "#fff",
+    width: "90%",
+    maxWidth: 400,
+    backgroundColor: "#ffffff",
     padding: 20,
     borderRadius: 10,
-    alignItems: "center",
+    borderColor: "#c2be99",
+    borderWidth: 1,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
     color: "#284767",
+    marginBottom: 15,
+    textAlign: "center",
   },
   closeModalButton: {
+    backgroundColor: "#7ebab6",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
     marginTop: 20,
   },
   closeModalButtonText: {
-    color: "#7ebab6",
+    color: "#ffffff",
     fontWeight: "bold",
-    fontSize: 15,
+    fontSize: 16,
+  },
+  inputModal: {
+    borderWidth: 1,
+    borderColor: "#ceceb1",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 10,
+    backgroundColor: "#f4f4f4",
   },
 });
-
+ 
 export default LoginScreen;

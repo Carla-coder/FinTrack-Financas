@@ -125,8 +125,16 @@ const TransactionsScreen = () => {
 
   const handleDateChange = (text) => {
     const numbers = text.replace(/\D/g, "");
-    const formattedDate = numbers
-      .match(/.{1,2}/g)?.join("/") || "";
+    let formattedDate = "";
+
+    if (numbers.length <= 4) {
+      formattedDate = numbers.match(/.{1,2}/g)?.join("/") || "";
+    } else if (numbers.length <= 6) {
+      formattedDate = `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 6)}`;
+    } else if (numbers.length > 6) {
+      formattedDate = `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    }
+
     setDate(formattedDate);
   };
 
@@ -264,6 +272,7 @@ const TransactionsScreen = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
