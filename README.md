@@ -89,7 +89,6 @@ https://my.visme.co/view/pvpe8yyo-fintrack
 
 O protótipo do projeto pode ser visualizado [neste link do Figma](https://www.figma.com/proto/4tw77ZcwhrmvqBoFfoC385/FinTrack?node-id=0-1&t=sBvlsGLJ3tiAyYAH-1).
 
-
 ## Wireframes
 
 ![Wireframe](Img/FinTrack.png)
