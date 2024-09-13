@@ -1,93 +1,95 @@
-# FinTrack
+# FinTrack - Cuidando de suas finanças!
 
 FinTrack é um site e aplicativo de gestão financeira projetado para ajudar os usuários a acompanhar e gerenciar suas finanças pessoais de maneira eficiente e intuitiva.
-
-## Protótipo
-
-O protótipo do projeto pode ser visualizado [neste link do Figma](https://www.figma.com/proto/4tw77ZcwhrmvqBoFfoC385/FinTrack?node-id=0-1&t=sBvlsGLJ3tiAyYAH-1).
 
 ## Apresentação Slides:
 
 https://my.visme.co/view/pvpe8yyo-fintrack
 
-## Estrutura do Repositório
+## Tecnologias Utilizadas
 
-Este repositório contém a seguinte estrutura:
+| Teconologias               | Linguagens |               
+| ----------------- | -------------|
+| Front-end      |  JavaScript, Bootstrap, HTML e CSS |
+| Back-end       |  Node, Express, Prisma e JWT |
+| Teste       |  Insomnia |
+| Back e Front     |  VsCode |
+  Banco      |   Xampp e Prisma
+| Mobile | React, Yarn, Expo | 
 
-### Pasta `docs/`
+## Instalação Web
 
-- **TAP.pdf**: Documento de Termo de Abertura de Projeto.
-- **prototipo.pdf**: Arquivo do protótipo funcional criado no Figma.
+1. Clone este repositorio e abra com o VsCode:
+
+```bash
+  git clone https://github.com/Carla-coder/proj1.git
+```
+2. Entre na pasta api:
+```bash
+  cd api
+```
+3. Crie um arquivo .env contendo:
+```bash
+  DATABASE_URL="mysql://root:@localhost:3306/FinTrack"
+  KEY="base64q3
+```
+4. Abra o Xampp e inicie o mysql e o apache 
+5. Inicie e instale as dependencias e o banco de dados no VsCode:
+```bash
+  npm i
+  npx prisma migrate dev --name fintrack init
+```
+6. Execute a api:
+```bash
+  nodemon
+```
+
+## Instalação Mobile
+
+1. Clone este repositorio e abra com o VsCode:
+
+```bash
+  git clone https://github.com/Carla-coder/proj1.git
+```
+
+2. Inicie o projeto:
+
+```bash
+  yarn install
+```
+
+3. Instale as dependencias: 
+```bash
+  yarn add @react-navigation/native
+  yarn add @react-navigation/bottom-tabs
+  yarn add @react-navigation/stack
+  yarn add @expo/vector-icons@react-native-picker/picker
+  yarn add @react-native-async-storage/async-storage
+  yarn add react-native-vector-icons/FontAwesome
+  yarn add validator
+  yarn add react-native-chart-kit
+
+```
+
+3. Execute o projeto:
+```bash
+  yarn start
+```
+## Documentação de cores
+
+| Cor               | Hexadecimal |               
+| ----------------- | -------------|
+| Cor 1       |  #c2be99 |
+| Cor 2       |  #ceceb1 |
+| Cor 3       |  #284767 |
+| Cor 4       |  #376f7b |
+  Cor 5       |   #7ebab6
+
+## Protótipo
+
+O protótipo do projeto pode ser visualizado [neste link do Figma](https://www.figma.com/proto/4tw77ZcwhrmvqBoFfoC385/FinTrack?node-id=0-1&t=sBvlsGLJ3tiAyYAH-1).
 
 
-## Identidade Visual
-
-A identidade visual do projeto inclui os seguintes elementos:
-
-- **Tipografia**: **League Spartan**
-
-## Cores Utilizadas
-
-- .color1 {color: #c2be99;}
-- .color2 {color: #ceceb1;}
-- .color3 {color: #284767;}
-- .color4 {color: #376f7b;}
-- .color5 {color: #7ebab6;}
-
-## Sprint 01 - Backlog
-- [x] Definir o Tema do Projeto
-- [x] Definir o Scrum Master / Gerenete de Projeto
-- [x] Criar um breve Orçamento
-- [x] TAP - Termo de Abertura do Projeto
-- [x] Criar o repositório do projeto no GitHub
-- [x] Adicionar o professor como colaborador
-- [x] Criar a Identidade Visual do Projeto
-- [x] Criar o Wireframe/Protótipo do Projeto
-
-## Sprint 02 - Backlog
-- [x] Fazer uma análise de Risco - Matriz SWOT
-- [x] Desenvolver um Cronograma - Gantt
-- [x] Traçar o caminho crítico - PERT/CPM
-- [x] EAP - Estrutura Analítica do Projeto
-    - [x] Criar o Documento de Requisitos
-    - [x] Diagrama de Caso de Uso - Corrigir
-- [x] Criar o Documento de Arquitetura
-    - [x] Diagrama de Classes
-    - [x] Diagrama de Atividades
-    - [x] DER - Diagrama de Entidade Relacionamento
-
-## Sprint 03 - Backlog
-- [ ] Desenvolver o Código
-    - [x] Front-End - Desenvolvimento
-    - [x] Banco de Dados - Desenvolvimento
-    - [x] Back-End - Desenvolvimento
-    - [x] Mobile - Desenvolvimento
-    - [x] Testes unitários - Desenvolvimento
-- [ ] Criar o Documento do Projeto
-    - [ ] ABNT
-    - [ ] Dicionário de Dados
-
-## Sprint 04 - Backlog
-- [ ] Criar o Documento de Teste
-    - [ ] Teste de Unidade
-    - [ ] Teste de Integração
-    - [ ] Teste de Sistema - Ponto a Ponto
-    - [ ] Teste de Aceitação
-- [ ] Revisar o documento do projeto
-- [ ] Criar o Documento de Implantação
-    - [ ] Manual do Usuário
-    - [ ] Manual do Administrador se houver
-
-## Apresentação
-- [ ] Apresentação do Projeto
-    - [ ] Apresentação do Projeto Web
-    - [ ] Apresentação do Projeto Mobile
-    - [ ] Documento do Projeto
-    - [ ] 
 ## Wireframes
 
 ![Wireframe](Img/FinTrack.png)
-
-## Matriz Swot
-
-![Matriz Swot](Img/MatrizSwot.png)
