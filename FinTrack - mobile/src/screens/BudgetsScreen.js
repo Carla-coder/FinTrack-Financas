@@ -1,25 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  FlatList,
-} from "react-native";
+import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, ScrollView, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from '@react-native-picker/picker';
-import { useFocusEffect } from '@react-navigation/native'; // Importa o hook
+import { useIsFocused } from '@react-navigation/native';
 
-export default function BudgetScreen() {
+export default function BudgetScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [category, setCategory] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
   const [budgets, setBudgets] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [editingBudget, setEditingBudget] = useState(null);
+
+  const isFocused = useIsFocused(); 
 
   const loadUserData = useCallback(async () => {
     try {
@@ -39,11 +32,11 @@ export default function BudgetScreen() {
     }
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
+    if (isFocused) {
       loadUserData();
-    }, [loadUserData])
-  );
+    }
+  }, [isFocused, loadUserData]);
 
   useEffect(() => {
     const recalculateBudgets = async () => {
@@ -131,12 +124,8 @@ export default function BudgetScreen() {
   const renderBudgetCard = ({ item }) => (
     <View style={[styles.budgetCard, item.isExceeded && styles.exceededCard]}>
       <Text style={styles.budgetCategory}>{item.category}</Text>
-      <Text style={styles.budgetDetails}>
-        Orçado: <Text style={styles.budgetOrcado}>+ R${item.budgetAmount.toFixed(2)}</Text>
-      </Text>
-      <Text style={styles.budgetDetails}>
-        Gasto: <Text style={styles.budgetGasto}>- R${item.spentAmount.toFixed(2)}</Text>
-      </Text>
+      <Text style={styles.budgetOrcado}>+ R${item.budgetAmount ? item.budgetAmount.toFixed(2) : '0.00'}</Text>
+      <Text style={styles.budgetGasto}>- R${item.spentAmount ? item.spentAmount.toFixed(2) : '0.00'}</Text>
       {!item.isExceeded ? (
         <Text style={styles.dontExceedText}>Adequado</Text>
       ) : (
@@ -245,7 +234,6 @@ export default function BudgetScreen() {
     </View>
   );
 }
-
 
 
 const styles = StyleSheet.create({

@@ -41,7 +41,7 @@ https://my.visme.co/view/pvpe8yyo-fintrack
 ```
 6. Execute a api:
 ```bash
-  nodemon
+  nodemon ou node server.js
 ```
 
 ## Instalação Mobile
@@ -91,4 +91,4 @@ O protótipo do projeto pode ser visualizado [neste link do Figma](https://www.f
 
 ## Wireframes
 
-![Wireframe](Img/FinTrack.png)
+![Wireframe](Documentação/Imagens/FinTrack.png)
