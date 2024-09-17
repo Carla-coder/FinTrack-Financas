@@ -41,7 +41,7 @@ https://my.visme.co/view/pvpe8yyo-fintrack
 ```
 6. Execute a api:
 ```bash
-  nodemon
+  nodemon ou node server.js
 ```
 
 ## Instalação Mobile
