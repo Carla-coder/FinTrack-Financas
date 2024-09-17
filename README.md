@@ -91,4 +91,4 @@ O protótipo do projeto pode ser visualizado [neste link do Figma](https://www.f
 
 ## Wireframes
 
-![Wireframe](Img/FinTrack.png)
+![Wireframe](Documentação/Imagem/FinTrack.png)
