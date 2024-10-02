@@ -144,7 +144,7 @@ Verificar se o usuário é direcionado para a página de cadastro.
 - [ ] Clique no botão "Cadastrar".
 
 ### Resultado Esperado
-Após o login, se os dados forem compatíveis com o cadastro, o usuário será direcionado para o aplicativo.
+- [ ] Após o login, se os dados forem compatíveis com o cadastro, o usuário será direcionado para o aplicativo.
 
 ---
 
@@ -158,7 +158,7 @@ Verificar a visualização de saldo atual e gastos.
 - [ ] O usuário visualiza suas últimas três transações sempre atualizadas.
 
 ### Resultado Esperado
-O usuário visualiza suas últimas três transações, saldo, gastos do mês e dois gráficos.
+- [ ] O usuário visualiza suas últimas três transações, saldo, gastos do mês e dois gráficos.
 
 ---
 
@@ -172,14 +172,14 @@ Verificar se o sistema permite adicionar e editar uma transação.
 - [ ] Preencha os campos necessários e clique no botão “Salvar”.
 
 ### Resultado Esperado
-A transação é listada com as informações cadastradas.
+- [ ] A transação é listada com as informações cadastradas.
 
 ### Passo 2: Editar Transação
 - [ ] Na tela Transações, clique no botão “lápis” para editar uma transação.
 - [ ] Preencha os campos necessários e clique no botão “Atualizar”.
 
 ### Resultado Esperado
-A tela de dashboard é atualizada conforme a transação editada.
+- [ ] A tela de dashboard é atualizada conforme a transação editada.
 
 ---
 
@@ -198,7 +198,7 @@ Verificar a validação das entradas de orçamento.
 - [ ] Preencha os campos necessários e clique no botão “Salvar”.
 
 ### Resultado Esperado
-O sistema deve adicionar, editar ou excluir um orçamento e exibir as mudanças.
+- [ ] O sistema deve adicionar, editar ou excluir um orçamento e exibir as mudanças.
 
 ---
 
@@ -213,7 +213,7 @@ Verificar se o sistema mostra os Relatórios Financeiros por tipo.
 - [ ] Clique no botão “Gerar Relatório”.
 
 ### Resultado Esperado
-O sistema deve fornecer um resumo completo do relatório escolhido.
+- [ ] O sistema deve fornecer um resumo completo do relatório escolhido.
 
 ---
 
@@ -227,7 +227,7 @@ Verificar se o layout é responsivo em diferentes tamanhos de tela.
 - [ ] Reduza a largura da janela para simular dispositivos móveis.
 
 ### Resultado Esperado
-O layout deve se ajustar corretamente e permanecer funcional.
+- [ ] O layout deve se ajustar corretamente e permanecer funcional.
 
 ---
 
